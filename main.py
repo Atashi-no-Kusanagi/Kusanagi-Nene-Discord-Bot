@@ -20,24 +20,23 @@ def home():
 
 def run():
     port = int(os.environ.get("PORT", 10000))
-    server.run(host='0.0.0.0', port=port)
-
-@tasks.loop(minutes=10)
-async def heartbeat():
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://kusanagi-nene-discord-bot.onrender.com") as resp:
-                if resp.status == 200:
-                    print("Heartbeat successful! 💓")
-    except Exception as e:
-        print(f"Heartbeat failed: {e}")
+    server.run(host='0.0.0.0', port=port, use_reloader=False)
 
 def keep_alive():
     t = Thread(target=run)
+    t.daemon = True 
     t.start()
-    t2 = Thread(target=heartbeat)
-    t2.start()
-  
+
+@tasks.loop(minutes=5)
+async def internal_heartbeat():
+    url = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'kusanagi-nene-discord-bot')}.onrender.com"
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                print(f"Internal Heartbeat: {resp.status}")
+    except Exception as e:
+        print(f"Heartbeat failed: {e}")
+
 keep_alive()
 
 intents = discord.Intents.default()
