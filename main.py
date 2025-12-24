@@ -10,7 +10,7 @@ import asyncio
 from supabase import create_client, Client
 from flask import Flask
 from threading import Thread
-import requests
+import aiohttp
 
 server = Flask('')
 
@@ -22,11 +22,15 @@ def run():
     port = int(os.environ.get("PORT", 10000))
     server.run(host='0.0.0.0', port=port)
 
-def self_ping():
-    while True:
-        requests.get("https://kusanagi-nene-discord-bot.onrender.com")
-        print("I pinged myself!")
-        time.sleep(300)
+@tasks.loop(minutes=10)
+async def heartbeat():
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://kusanagi-nene-discord-bot.onrender.com") as resp:
+                if resp.status == 200:
+                    print("Heartbeat successful! 💓")
+    except Exception as e:
+        print(f"Heartbeat failed: {e}")
 
 def keep_alive():
     t = Thread(target=run)
