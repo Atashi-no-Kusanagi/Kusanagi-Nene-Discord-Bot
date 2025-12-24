@@ -532,7 +532,6 @@ async def pay(ctx, member : discord.Member = None, amount : int = 1):
 async def antiraid(ctx):
     pass
 
-load_nenebucks_json()
 level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
 bot.run(TOKEN_KEY)
