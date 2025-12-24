@@ -9,6 +9,7 @@ from discord.ext import commands
 import asyncio
 from supabase import create_client, Client
 from flask import Flask
+from threading import Thread
 
 intents = discord.Intents.default()
 intents.message_content = True
