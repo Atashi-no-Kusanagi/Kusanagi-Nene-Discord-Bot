@@ -18,7 +18,7 @@ def home():
     return "Nene is awake and watching! 👀"
 
 def run():
-    port = int(os.environ.get("PORT", 10000)
+    port = int(os.environ.get("PORT", 10000))
     server.run(host='0.0.0.0', port=port)
 
 def keep_alive():
