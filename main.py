@@ -1,7 +1,7 @@
 if __name__ != "__main__":
   exit()
 
-import discord, os, random, time, json, signal, threading
+import discord, os, random, time, json, threading
 from datetime import date
 from discord.app_commands.errors import CommandInvokeError
 from discord.embeds import Embed
@@ -18,7 +18,8 @@ def home():
     return "Nene is awake and watching! 👀"
 
 def run():
-    server.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get("PORT", 10000)
+    server.run(host='0.0.0.0', port=port)
 
 def keep_alive():
     t = Thread(target=run)
@@ -126,16 +127,6 @@ def refresh_threshold():
     while True:
         time.sleep(30)
         member_last30 = 0
-
-
-def handle_exit_signal(*args):
-    save_level_json()
-    save_nenebucks_json()
-    print("Bot stopped! Data saved safely 💾")
-    exit(0)
-
-signal.signal(signal.SIGINT, handle_exit_signal)
-signal.signal(signal.SIGTERM, handle_exit_signal)
 
 thread = threading.Thread(target=refresh_threshold)
 thread.start()
