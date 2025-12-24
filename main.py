@@ -7,6 +7,7 @@ from discord.app_commands.errors import CommandInvokeError
 from discord.embeds import Embed
 from discord.ext import commands
 import asyncio
+from supabase import create_client, Client
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -31,7 +32,10 @@ last_headpat = 0
 ily_cooldown = 600
 last_ily = 0
 
-nenebucks_dict = {}
+SUPABASE_URL = os.getenv("SUPABASE_URL") 
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 level = 1
 xp = 0
 full_xp = 50
@@ -39,48 +43,63 @@ full_xp = 50
 member_last30 = 0 
 members_threshold = 30
 
-def save_nenebucks_json():
-  with open("currencies.json", "w") as file:
-      json.dump(nenebucks_dict, file)
-
-def load_nenebucks_json():
-  try:
-      with open("currencies.json", "r") as file:
-          data = json.load(file)
-  except (FileNotFoundError, json.JSONDecodeError):
-      data = {}
-
-  nenebucks_dict.clear()
-  nenebucks_dict.update({int(k): v for k, v in data.items()})
-
-def save_level_json():
-    with open("leveling.json", "w") as file:
-        json.dump({
-            "level": level,
-            "xp": xp,
-            "full_xp": full_xp
-        }, file)
-
-def load_level_json():
-    global level, xp, full_xp
+def get_balance(user_id):
     try:
-        with open("leveling.json") as file:
-            data = json.load(file)
-            level = data.get("level", 1)
-            xp = data.get("xp", 0)
-            full_xp = data.get("full_xp", 50)
-    except FileNotFoundError:
-        level, xp, full_xp = 1, 0, 50
+        response = supabase.table('profiles').select('balance').eq('user_id', user_id).execute()
+        if response.data:
+            return response.data[0]['balance']
+        return None
+    except Exception as e:
+        print(f"Database Error: {e}")
+        return None
 
+def update_balance(user_id, new_amount):
+    try:
+        supabase.table('profiles').update({'balance': new_amount}).eq('user_id', user_id).execute()
+    except Exception as e:
+        print(f"Database Error: {e}")
+
+def create_account_db(user_id):
+    try:
+        supabase.table('profiles').insert({'user_id': user_id, 'balance': 10}).execute()
+        return True
+    except Exception as e:
+        print(f"Creation Error: {e}")
+        return False
+
+def get_global_stats():
+    """Fetches level, xp, and full_xp from the database."""
+    try:
+        # We always fetch the row where ID is 1
+        response = supabase.table('bot_stats').select('*').eq('id', 1).execute()
+        if response.data:
+            data = response.data[0]
+            return data['level'], data['xp'], data['full_xp']
+        return 1, 0, 50 # Default if table is empty
+    except Exception as e:
+        print(f"DB Error (Get Stats): {e}")
+        return 1, 0, 50
+
+def update_global_stats(new_level, new_xp, new_full_xp):
+    """Updates the bot's stats in the database."""
+    try:
+        supabase.table('bot_stats').update({
+            'level': new_level,
+            'xp': new_xp,
+            'full_xp': new_full_xp
+        }).eq('id', 1).execute()
+    except Exception as e:
+        print(f"DB Error (Update Stats): {e}")
 
 def compute_if_full():
-  global level, xp, full_xp
-  if xp >= full_xp:
-      xp = 0
-      full_xp *= 1.25
-      level += 1
-
-  save_level_json()
+    global level, xp, full_xp
+    
+    if xp >= full_xp:
+        xp = 0
+        full_xp = int(full_xp * 1.25)
+        level += 1
+      
+    update_global_stats(level, xp, full_xp)
 
 def cooldown_ready(last_time, cooldown):
   return time.time() - last_time >= cooldown
@@ -161,7 +180,7 @@ async def sleep(ctx):
 
 @bot.command()
 async def cuddle(ctx):
-  global last_cuddle, xp
+  global last_cuddle, xp, level, full_xp
   xp_level_up = None
 
   response_list = [
@@ -185,7 +204,7 @@ async def cuddle(ctx):
 
 @bot.command()
 async def kiss(ctx, member: discord.Member = None):
-  global last_kiss, xp
+  global last_kiss, xp, level, full_xp
   xp_level_up = None
   try:
       if member is None or member.id == bot.application_id:
@@ -229,7 +248,7 @@ async def kiss(ctx, member: discord.Member = None):
 
 @bot.command()
 async def hug(ctx):
-  global last_hug, xp
+  global last_hug, xp, level, full_xp
   xp_level_up = None
 
   response_list = [
@@ -281,7 +300,7 @@ async def slap(ctx, member: discord.Member = None):
 
 @bot.command()
 async def headpat(ctx):
-  global last_headpat, xp
+  global last_headpat, xp, level, full_xp
   xp_level_up = None
 
   response_list = [
@@ -376,84 +395,83 @@ async def showcmds(ctx):
 
 @bot.command()
 async def coinflip(ctx, bet : int, pick):
-  ctx_money = 0
-  if ctx.author.id in nenebucks_dict:
-    ctx_money = nenebucks_dict[ctx.author.id]
-  else:
-    await ctx.reply(f"*Tsk tsk tsk*...I'm sorry, but I can't find a \"{ctx.author}\" in these files...Maybe try registering via KN-make_acc.")
-      
-  if ctx_money and ctx_money >= bet and bet > 0:
-      ctx_money -= bet
-      nenebucks_dict[ctx.author.id] = ctx_money
+    current_bal = get_balance(ctx.author.id)
 
-      if pick.lower() == "h":
-          pick = "heads"
-      elif pick.lower() == "t":
-          pick = "tails"
+    if current_bal is None:
+        await ctx.reply(f"*Tsk tsk tsk*...I'm sorry, but I can't find a \"{ctx.author}\" in these files...Maybe try registering via KN-make_acc.")
+        return # Stop the command here
 
-      initial_msg = discord.Embed(
-          title="*Hmm...sure. I'll flip a coin for you.* **Coin flips in the air**",
-          description="The coin lands gracefully",
-          color=discord.Color.green()
-      )
+    if bet > 0 and current_bal >= bet:
+        # Deduct bet immediately (Safety first!)
+        new_bal = current_bal - bet
+        update_balance(ctx.author.id, new_bal)
 
-      msg = await ctx.reply(embed=initial_msg)
+        if pick.lower() == "h": pick = "heads"
+        elif pick.lower() == "t": pick = "tails"
 
-      await asyncio.sleep(2)
+        initial_msg = discord.Embed(
+            title="*Hmm...sure. I'll flip a coin for you.* **Coin flips in the air**",
+            description="The coin lands gracefully",
+            color=discord.Color.green()
+        )
+        msg = await ctx.reply(embed=initial_msg)
+        await asyncio.sleep(2)
 
-      coin_possibilities = ["heads", "tails"]
-      coin_random = random.randint(0, 1)
-      coin_actual = coin_possibilities[coin_random]
+        coin_possibilities = ["heads", "tails"]
+        coin_actual = random.choice(coin_possibilities)
 
-      msg_to_send = discord.Embed(
-          title="*Hmm...sure. I'll flip a coin for you.* **Coin flips in the air**",
-          description=f"It was {coin_actual}!",
-          color=discord.Color.green()
-      )
+        msg_to_send = discord.Embed(
+            title="*Hmm...sure. I'll flip a coin for you.* **Coin flips in the air**",
+            description=f"It was {coin_actual}!",
+            color=discord.Color.green()
+        )
 
-
-      if pick == coin_actual:
-          msg_to_send.description += f" You won, {ctx.author.mention}!"
-          bet *= 2
-          nenebucks_dict[ctx.author.id] = ctx_money + bet
-
-      else:
-          msg_to_send.description += f" Oof...you lost, {ctx.author.mention}, but hey, better luck next time."
-
-      save_nenebucks_json()
-
-      await msg.edit(embed=msg_to_send)
+        if pick == coin_actual:
+            msg_to_send.description += f" You won, {ctx.author.mention}!"
+            # Add reward (Bet * 2) back to balance
+            winnings = bet * 2
+            update_balance(ctx.author.id, new_bal + winnings)
+        else:
+            msg_to_send.description += f" Oof...you lost, {ctx.author.mention}, but hey, better luck next time."
+            # No need to update balance, we already deducted the bet
+        
+        await msg.edit(embed=msg_to_send)
+    else:
+        await ctx.reply("You don't have enough Nenebucks for that bet!")
 
 @bot.command()
 async def make_acc(ctx):
-  if ctx.author.id in nenebucks_dict:
-      await ctx.reply("Uhm...You already have an account here.")
-  else:
-      await ctx.reply("Hmm..I'm gonna try making an account for you.")
-
-      nenebucks_dict[ctx.author.id] = 10
-
-      save_nenebucks_json()
-
-      if ctx.author.id in nenebucks_dict:
-          await ctx.reply("Did it! You have **10 Nenebucks** to your name; earn some via KN-coinflip.")
-      else:
-          await ctx.reply("Oops...something happened, and I **couldn't create your account**. Can you try again?")
+    balance = get_balance(ctx.author.id) 
+    
+    if balance is not None:
+        await ctx.reply("Uhm...You already have an account here.")
+    else:
+        await ctx.reply("Hmm..I'm gonna try making an account for you.")
+        
+        success = create_account_db(ctx.author.id)
+        
+        if success:
+            await ctx.reply("Did it! You have **10 Nenebucks** to your name; earn some via KN-coinflip.")
+        else:
+            await ctx.reply("Oops...something happened, and I **couldn't create your account**. Can you try again?")
 
 @bot.command()
 async def my_acc(ctx):
-  if ctx.author.id in nenebucks_dict:
-      embed_var = discord.Embed(
-          title = f"{ctx.author.mention}'s Account Statement *(ID: {ctx.author.id})*",
-          description = f"""{nenebucks_dict[ctx.author.id]} Nenebucks
-          
-          ーProvided by Kusanagi Nene♪☆""",
-          color = discord.Color.green()
-      )
-      await ctx.send(f"*She comes back holding a stack of files* I found your file, {ctx.author.mention}.")
-      await ctx.send(embed=embed_var)
-  else:
-      await ctx.reply(f"*She alternates from flipping through the files and licking her fingers* Hmm...I can't find a \"{ctx.author}\" here...**Try making an account with KN-make_acc.**")
+    balance = get_balance(ctx.author.id)
+
+    if balance is not None:
+        embed_var = discord.Embed(
+            title = f"{ctx.author.mention}'s Account Statement *(ID: {ctx.author.id})*",
+            description = f"""{balance} Nenebucks
+            
+            ーProvided by Kusanagi Nene♪☆""",
+            color = discord.Color.green()
+        )
+        await ctx.send(f"*She comes back holding a stack of files* I found your file, {ctx.author.mention}.")
+        await ctx.send(embed=embed_var)
+    else:
+        await ctx.reply(f"*She alternates from flipping through the files and licking her fingers* Hmm...I can't find a \"{ctx.author}\" here...**Try making an account with KN-make_acc.**")
+
 
 @bot.command()
 async def bite(ctx, member : discord.Member = None):
@@ -481,40 +499,41 @@ async def bite(ctx, member : discord.Member = None):
 
 @bot.command()
 async def pay(ctx, member : discord.Member = None, amount : int = 1):
-    if ctx.author.id not in nenebucks_dict:
-        ctx.reply("Hmm...sorry, can't find your account here. Maybe try *KN-makeacc*?")
-        return
-
-    if member.id not in nenebucks_dict:
-        ctx.reply(f"I can't find a {member.mention} here, sorry. They probably haven't registered yet.")
+    if member is None:
+        await ctx.reply("You need to mention someone to pay!")
         return
         
-    if member is None:
-        ctx.reply(f"You need to mention a user to pay them, {ctx.author.mention}.")
-    elif member.id == ctx.author.id:
-        ctx.reply(f"...What's the point of that? You can't pay yourself *your own Nenebucks*, {ctx.author.mention}.")
-    else:
-        if amount > nenebucks_dict[ctx.author.id]:
-            ctx.reply("Calm down! You don't have enough Nenebucks for that.")
-            return
+    sender_bal = get_balance(ctx.author.id)
+    receiver_bal = get_balance(member.id)
 
-        nenebucks_dict[ctx.author.id] -= amount
-        nenebucks_dict[member.id] += amount
+    if sender_bal is None:
+        await ctx.reply("Hmm...sorry, can't find your account here. Maybe try *KN-makeacc*?")
+        return
 
-        ctx.reply("I've completed your transfer! But just to be sure, please, view your account using *KN-my_acc*.")
+    if receiver_bal is None:
+        await ctx.reply(f"I can't find {member.mention} here. They haven't registered yet.")
+        return
+    
+    if member.id == ctx.author.id:
+        await ctx.reply("You can't pay yourself!")
+        return
+
+    if amount > sender_bal:
+        await ctx.reply("Calm down! You don't have enough Nenebucks for that.")
+        return
+    
+    # Process Transaction
+    update_balance(ctx.author.id, sender_bal - amount)
+    update_balance(member.id, receiver_bal + amount)
+
+    await ctx.reply("I've completed your transfer! But just to be sure, please, view your account using *KN-my_acc*.")
 
 @bot.command()
 async def antiraid(ctx):
     pass
 
-async def autosave_loop():
-    await bot.wait_until_ready()
-    while not bot.is_closed():
-        save_level_json()
-        save_nenebucks_json()
-        await asyncio.sleep(30)
-
-
 load_nenebucks_json()
-load_level_json()
+level, xp, full_xp = get_global_stats()
+print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
 bot.run(TOKEN_KEY)
+
