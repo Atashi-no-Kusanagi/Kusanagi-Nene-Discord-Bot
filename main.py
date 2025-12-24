@@ -393,8 +393,7 @@ async def showcmds(ctx):
   `KN-pay <member> <amount>` : Pay someone <amount> Nenebucks
   
   ------------ Admin commands -----------
-  `KN-sleep` : Puts me to sleep (only admins can do this) (Graceful shutdown)
-  `KN-antiraid` : Checks if there's a raid. If there is, takes proper measures""",
+  `KN-antiraid` : Checks if there's a raid. If there is, takes proper measures *(Doesn't work, too lazy to implement nyehehhehee)*""",
       color=discord.Color.green()
   )
   await ctx.send(embed=embed)
