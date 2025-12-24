@@ -8,6 +8,7 @@ from discord.embeds import Embed
 from discord.ext import commands
 import asyncio
 from supabase import create_client, Client
+from flask import Flask
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -532,5 +533,19 @@ async def antiraid(ctx):
 
 level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
-bot.run(TOKEN_KEY)
 
+server = Flask('')
+
+@server.route('/')
+def home():
+    return "Nene is awake and watching! 👀"
+
+def run():
+    server.run(host='0.0.0.0', port=10000)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+  
+keep_alive()
+bot.run(TOKEN_KEY)
