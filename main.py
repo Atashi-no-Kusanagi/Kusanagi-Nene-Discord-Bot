@@ -543,7 +543,7 @@ async def antiraid(ctx):
     pass
 
 level, xp, full_xp = get_global_stats()
-print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}"
+print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
 
 if __name__ == "__main__":
     def run_bot():
