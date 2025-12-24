@@ -10,6 +10,7 @@ import asyncio
 from supabase import create_client, Client
 from flask import Flask
 from threading import Thread
+import requests
 
 server = Flask('')
 
@@ -21,9 +22,17 @@ def run():
     port = int(os.environ.get("PORT", 10000))
     server.run(host='0.0.0.0', port=port)
 
+def self_ping():
+    while True:
+        requests.get("https://kusanagi-nene-discord-bot.onrender.com")
+        print("I pinged myself!")
+        time.sleep(300)
+
 def keep_alive():
     t = Thread(target=run)
     t.start()
+    t2 = Thread(target=self_ping())
+    t2.start()
   
 keep_alive()
 
