@@ -127,8 +127,6 @@ thread.start()
 async def on_ready():
   print(f'We have logged in as {bot.user}')
 
-  asyncio.create_task(autosave_loop())
-
   channel = await bot.fetch_channel(wakeup_channel_id)
 
   if channel:     
