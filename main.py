@@ -35,7 +35,7 @@ async def heartbeat():
 def keep_alive():
     t = Thread(target=run)
     t.start()
-    t2 = Thread(target=self_ping())
+    t2 = Thread(target=self_ping)
     t2.start()
   
 keep_alive()
