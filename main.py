@@ -5,7 +5,7 @@ import discord, os, random, time, json, threading
 from datetime import date
 from discord.app_commands.errors import CommandInvokeError
 from discord.embeds import Embed
-from discord.ext import commands
+from discord.ext import commands, tasks
 import asyncio
 from supabase import create_client, Client
 from flask import Flask
