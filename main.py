@@ -22,11 +22,6 @@ def run():
     port = int(os.environ.get("PORT", 10000))
     server.run(host='0.0.0.0', port=port, use_reloader=False)
 
-def keep_alive():
-    t = Thread(target=run)
-    t.daemon = True 
-    t.start()
-
 @tasks.loop(minutes=5)
 async def internal_heartbeat():
     url = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'kusanagi-nene-discord-bot')}.onrender.com"
@@ -36,8 +31,6 @@ async def internal_heartbeat():
                 print(f"Internal Heartbeat: {resp.status}")
     except Exception as e:
         print(f"Heartbeat failed: {e}")
-
-keep_alive()
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -550,6 +543,10 @@ async def antiraid(ctx):
     pass
 
 level, xp, full_xp = get_global_stats()
-print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
+print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}"
 
-bot.run(TOKEN_KEY)
+if __name__ == "__main__":
+    def run_bot():
+        bot.run(TOKEN_KEY)
+    
+    Thread(target=run_bot).start()
