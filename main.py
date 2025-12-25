@@ -133,6 +133,7 @@ def get_global_stats():
 def update_global_stats(new_level, new_xp, new_full_xp):
     """Updates the bot's stats in the database."""
     try:
+        print(f"SAVING → level={new_level}, xp={new_xp}, full_xp={new_full_xp}")
         supabase.table('bot_stats').update({
             'level': new_level,
             'xp': new_xp,
@@ -143,12 +144,12 @@ def update_global_stats(new_level, new_xp, new_full_xp):
 
 def compute_if_full():
     global level, xp, full_xp
-    
+
     if xp >= full_xp:
         xp = 0
         full_xp = int(full_xp * 1.25)
         level += 1
-      
+
     update_global_stats(level, xp, full_xp)
 
 def cooldown_ready(last_time, cooldown):
@@ -201,9 +202,6 @@ async def on_member_join(member):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def sleep(ctx):
-  save_level_json()
-  save_nenebucks_json()
-
   response_list = [
       "Ugh...already? Okay...goodnight...",
       "Eh...Do I have to?...Fine. Bye bye!",
