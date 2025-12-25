@@ -14,9 +14,9 @@ import aiohttp
 
 server = Flask('')
 
-@server.route('/')
-def home():
-    return "Nene is awake and watching! 👀"
+@server.route('/health')
+def health_check():
+    return {"status": "ok", "bot_online": bot.is_ready()}, 200
 
 def run():
     port = int(os.environ.get("PORT", 10000))
