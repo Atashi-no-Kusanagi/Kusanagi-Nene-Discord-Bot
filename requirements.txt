@@ -4,3 +4,4 @@ supabase
 flask
 aiohttp
 gunicorn
+threading
