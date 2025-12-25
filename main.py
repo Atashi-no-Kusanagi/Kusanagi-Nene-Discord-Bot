@@ -1,36 +1,62 @@
-if __name__ != "__main__":
-  exit()
-
-import discord, os, random, time, json, threading
+import os
+import time
+import random
+import json
+import asyncio
 from datetime import date
+
+import discord
+from discord.ext import commands, tasks
 from discord.app_commands.errors import CommandInvokeError
 from discord.embeds import Embed
-from discord.ext import commands, tasks
-import asyncio
-from supabase import create_client, Client
-from flask import Flask
+
+from flask import Flask, jsonify
 from threading import Thread
 import aiohttp
 
-server = Flask('')
+from supabase import create_client, Client
+
+ENABLE_HEALTH = os.getenv("ENABLE_HEALTH_SERVER", "0") == "1"
+PORT = int(os.getenv("PORT", 10000))
+WAKEUP_CHANNEL_ID = int(os.getenv("WAKEUP_CHANNEL_ID", 1451915364396171437))
+
+TOKEN = os.getenv("KUSANAGI_APIKEY")
+if not TOKEN:
+    print("ERROR: No Discord token found. Set DISCORD_TOKEN environment variable.")
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client | None = None
+
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception as e:
+        print(f"Supabase init failed: {e}")
+
+server = Flask(__name__)
 
 @server.route('/health')
 def health_check():
-    return {"status": "ok", "bot_online": bot.is_ready()}, 200
-
-def run():
-    port = int(os.environ.get("PORT", 10000))
-    server.run(host='0.0.0.0', port=port, use_reloader=False)
-
-@tasks.loop(minutes=5)
-async def internal_heartbeat():
-    url = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'kusanagi-nene-discord-bot')}.onrender.com"
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                print(f"Internal Heartbeat: {resp.status}")
-    except Exception as e:
-        print(f"Heartbeat failed: {e}")
+        ready = False
+        if 'bot' in globals() and getattr(globals()['bot'], 'is_ready', None):
+            try:
+                ready = bool(globals()['bot'].is_ready())
+            except Exception:
+                ready = False
+    except Exception:
+        ready = False
+    
+    return jsonify({"status": "ok", "bot_online": ready}), 200
+
+
+def _start_flask_in_thread():
+    def _run():
+        server.run(host='0.0.0.0', port=PORT, use_reloader=False)
+    t = Thread(target=_run, daemon=True)
+    t.start()
+    print(f"Started health server thread on port {PORT}")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -127,11 +153,10 @@ def compute_if_full():
 def cooldown_ready(last_time, cooldown):
   return time.time() - last_time >= cooldown
 
-def refresh_threshold():
+@tasks.loop(seconds=30)
+async def refresh_threshold():
     global member_last30
-    while True:
-        time.sleep(30)
-        member_last30 = 0
+    member_last30 = 0
 
 thread = threading.Thread(target=refresh_threshold)
 thread.start()
@@ -545,8 +570,15 @@ async def antiraid(ctx):
 level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
 
-if __name__ == "__main__":
-    def run_bot():
-        bot.run(TOKEN_KEY)
-    
-    Thread(target=run_bot).start()
+if __name__ == '__main__':
+    if ENABLE_HEALTH:
+        _start_flask_in_thread()
+        print("Health endpoint enabled — remember to set ENABLE_HEALTH_SERVER=1 in Render and use an external pinger to hit health")
+
+    if not TOKEN:
+        print("Missing token. Exiting.")
+    else:
+        try:
+            bot.run(TOKEN)
+        except Exception as e:
+            print(f"Bot failed to start: {e}")
