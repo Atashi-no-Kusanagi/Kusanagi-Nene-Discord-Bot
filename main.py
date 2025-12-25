@@ -11,6 +11,7 @@ from discord.app_commands.errors import CommandInvokeError
 from discord.embeds import Embed
 
 from flask import Flask, jsonify
+import threading
 from threading import Thread
 import aiohttp
 
@@ -20,7 +21,7 @@ ENABLE_HEALTH = os.getenv("ENABLE_HEALTH_SERVER", "0") == "1"
 PORT = int(os.getenv("PORT", 10000))
 WAKEUP_CHANNEL_ID = int(os.getenv("WAKEUP_CHANNEL_ID", 1451915364396171437))
 
-TOKEN = os.getenv("KUSANAGI_APIKEY")
+TOKEN = os.getenv("DISCORD_TOKEN") or os.getenv("KUSANAGI_APIKEY")
 if not TOKEN:
     print("ERROR: No Discord token found. Set DISCORD_TOKEN environment variable.")
 
@@ -157,14 +158,14 @@ def cooldown_ready(last_time, cooldown):
 async def refresh_threshold():
     global member_last30
     member_last30 = 0
-
-thread = threading.Thread(target=refresh_threshold)
-thread.start()
-
+    
 @bot.event
 async def on_ready():
   print(f'We have logged in as {bot.user}')
 
+  if not refresh_threshold.is_running():
+      refresh_threshold.start()
+    
   channel = await bot.fetch_channel(wakeup_channel_id)
 
   if channel:     
