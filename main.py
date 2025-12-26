@@ -93,8 +93,6 @@ full_xp = 50
 member_last30 = 0 
 members_threshold = 30
 
-messages_last120 = 0
-messages_threshold = 500
 def get_balance(user_id):
     try:
         response = supabase.table('profiles').select('balance').eq('user_id', user_id).execute()
@@ -200,17 +198,6 @@ async def on_member_join(member):
   else:
       member_last30 += 1
       
-@bot.event
-async def on_message(message):
-  global messages_last120, messages_threshold
-
-  if message.channel == discord.TextChannel:
-    if message.TextChannel.id != (1451916474976567429, 1453373995431760048):
-      messages_last120 += 1
-
-  if messages_last120 > messages_threshold:
-    await message.delete(message)
-
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def sleep(ctx):
