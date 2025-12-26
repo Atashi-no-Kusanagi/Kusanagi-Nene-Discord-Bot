@@ -631,20 +631,20 @@ async def banish(ctx, member : discord.Member = None, reason : str = None, secon
 @commands.has_permissions(ban_members=True)
 async def awaken(ctx, member : discord.Member = None, reason : str = None):
     try:
-        if member is None:
-      await ctx.reply("...Unban who?")
-    elif member.id == ctx.author.id:
-      await ctx.reply(f"...That's impossible, {ctx.author.mention}.")
-    elif member.id == bot.id:
-      await ctx.reply("I can't do that...because I'm not banned.")
-    else:
-      await member.unban(member, reason=reason)
-  except NotFound:
-    await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
-  except Forbidden:
-    await ctx.reply("You don't have the permission to ban a member.")
-  except HTTPException:
-    await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
+      if member is None:
+        await ctx.reply("...Unban who?")
+      elif member.id == ctx.author.id:
+        await ctx.reply(f"...That's impossible, {ctx.author.mention}.")
+      elif member.id == bot.id:
+        await ctx.reply("I can't do that...because I'm not banned.")
+      else:
+        await member.unban(member, reason=reason)
+    except NotFound:
+      await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
+    except Forbidden:
+      await ctx.reply("You don't have the permission to ban a member.")
+    except HTTPException:
+      await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
 
 level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
