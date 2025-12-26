@@ -436,7 +436,8 @@ async def showcmds(ctx):
   ------------ Special commands -----------
   `KN-lock | <channel>` : I'll lock a specified channel or the channel the command was sent in
   `KN-buttkick` <member> <reason>` : Buttkick someone from the server
-  `KN-banish <member> <reason> <seconds worth of messages to delete>` : Send a member to hell""",
+  `KN-banish <member> <reason> <seconds worth of messages to delete>` : Send a member to hell
+  `KN-awaken <member> <reason>` : Unban a member and bring them back from hell""",
       color=discord.Color.green()
   )
   await ctx.send(embed=embed)
@@ -576,7 +577,7 @@ async def pay(ctx, member : discord.Member = None, amount : int = 1):
     await ctx.reply("I've completed your transfer! But just to be sure, please, view your account using *KN-my_acc*.")
 
 @bot.command()
-@command.has_permissions(manage_channels=True)
+@commands.has_permissions(manage_channels=True)
 async def lock(ctx, channel_to_lock : discord.TextChannel = None):
   channel = channel_to_lock or ctx.channel
 
@@ -591,7 +592,7 @@ async def lock(ctx, channel_to_lock : discord.TextChannel = None):
   await ctx.reply(f"I've locked down channel {channel}...")
 
 @bot.command()
-@command.has_permissions(kick_members=True)
+@commands.has_permissions(kick_members=True)
 async def buttkick(ctx, member : discord.Member = None):
   try:
     if member is None:
@@ -608,7 +609,7 @@ async def buttkick(ctx, member : discord.Member = None):
     await ctx.reply("You don't have the permission to kick a member.")
 
 @bot.command()
-@command.has_permissions(ban_members=True)
+@commands.has_permissions(ban_members=True)
 async def banish(ctx, member : discord.Member = None, reason : str = None, seconds_messages : int = 86400):
   try:
     if member is None:
@@ -616,9 +617,28 @@ async def banish(ctx, member : discord.Member = None, reason : str = None, secon
     elif member.id == ctx.author.id:
       await ctx.reply(f"I'm not banning you, {ctx.author.mention}.")
     elif member.id == bot.id:
-      await ctx.reply(f"...I'm not doing that to myself?! *slap*")
+      await ctx.reply("...I'm not doing that to myself?! *slap*")
     else:
-      await member.ban(member, reason=reason)
+      await member.ban(member, reason=reason, delete_message_seconds=seconds_messages)
+  except NotFound:
+    await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
+  except Forbidden:
+    await ctx.reply("You don't have the permission to ban a member.")
+  except HTTPException:
+    await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
+
+@bot.command()
+@commands.has_permissions(ban_members=True)
+async def awaken(ctx, member : discord.Member = None, reason : str = None):
+    try:
+        if member is None:
+      await ctx.reply("...Unban who?")
+    elif member.id == ctx.author.id:
+      await ctx.reply(f"...That's impossible, {ctx.author.mention}.")
+    elif member.id == bot.id:
+      await ctx.reply("I can't do that...because I'm not banned.")
+    else:
+      await member.unban(member, reason=reason)
   except NotFound:
     await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
   except Forbidden:
