@@ -93,6 +93,8 @@ full_xp = 50
 member_last30 = 0 
 members_threshold = 30
 
+messages_last120 = 0
+messages_threshold = 500
 def get_balance(user_id):
     try:
         response = supabase.table('profiles').select('balance').eq('user_id', user_id).execute()
@@ -198,6 +200,16 @@ async def on_member_join(member):
   else:
       member_last30 += 1
       
+@bot.event
+async def on_message(message):
+  global messages_last120, messages_threshold
+
+  if message.channel == discord.TextChannel:
+    if message.TextChannel.id != (1451916474976567429, 1453373995431760048):
+      messages_last120 += 1
+
+  if messages_last120 > messages_threshold:
+    await message.delete(message)
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -418,11 +430,13 @@ async def showcmds(ctx):
   `KN-stats` : See my stats (level, xp/max level xp)
   `KN-coinflip <bet> <pick>` : Do a coinflip; winning doubles your bet
   `KN-make_acc` : Register a new unique account
-  `KN-my_acc` : View your account
-  `KN-pay <member> <amount>` : Pay someone <amount> Nenebucks
+  `KN-my_acc` : View your account (after registering!)
+  `KN-pay <member> <amount>` : Pay someone <amount> Nenebucks!
   
-  ------------ Admin commands -----------
-  `KN-antiraid` : Checks if there's a raid. If there is, takes proper measures *(Doesn't work, too lazy to implement nyehehhehee)*""",
+  ------------ Special commands -----------
+  `KN-lock | <channel>` : I'll lock a specified channel or the channel the command was sent in
+  `KN-buttkick` <member> <reason>` : Buttkick someone from the server
+  `KN-banish <member> <reason> <seconds worth of messages to delete>` : Send a member to hell""",
       color=discord.Color.green()
   )
   await ctx.send(embed=embed)
@@ -433,10 +447,9 @@ async def coinflip(ctx, bet : int, pick):
 
     if current_bal is None:
         await ctx.reply(f"*Tsk tsk tsk*...I'm sorry, but I can't find a \"{ctx.author}\" in these files...Maybe try registering via KN-make_acc.")
-        return # Stop the command here
+        return
 
     if bet > 0 and current_bal >= bet:
-        # Deduct bet immediately (Safety first!)
         new_bal = current_bal - bet
         update_balance(ctx.author.id, new_bal)
 
@@ -462,12 +475,10 @@ async def coinflip(ctx, bet : int, pick):
 
         if pick == coin_actual:
             msg_to_send.description += f" You won, {ctx.author.mention}!"
-            # Add reward (Bet * 2) back to balance
             winnings = bet * 2
             update_balance(ctx.author.id, new_bal + winnings)
         else:
             msg_to_send.description += f" Oof...you lost, {ctx.author.mention}, but hey, better luck next time."
-            # No need to update balance, we already deducted the bet
         
         await msg.edit(embed=msg_to_send)
     else:
@@ -496,7 +507,9 @@ async def my_acc(ctx):
     if balance is not None:
         embed_var = discord.Embed(
             title = f"{ctx.author.mention}'s Account Statement *(ID: {ctx.author.id})*",
-            description = f"""{balance} Nenebucks
+            description = f"""
+            
+            {balance} Nenebucks
             
             ーProvided by Kusanagi Nene♪☆""",
             color = discord.Color.green()
@@ -509,7 +522,7 @@ async def my_acc(ctx):
 
 @bot.command()
 async def bite(ctx, member : discord.Member = None):
-    if member is None:
+    if member is None or member.id == bot.id:
         response_list = [
             "Oww! *Pushes you away* What was that for?!",
             f"*{ctx.author.mention} aggressively bites Nene in the arm, almost drawing blood* OWWWWWW! *She slaps them in the face and bites them back even harder, puncturing their skin* HOW ABOUT THAT?!",
@@ -563,8 +576,55 @@ async def pay(ctx, member : discord.Member = None, amount : int = 1):
     await ctx.reply("I've completed your transfer! But just to be sure, please, view your account using *KN-my_acc*.")
 
 @bot.command()
-async def antiraid(ctx):
-    pass
+@command.has_permissions(manage_channels=True)
+async def lock(ctx, channel_to_lock : discord.TextChannel = None):
+  channel = channel_to_lock or ctx.channel
+
+  if channel_to_lock:
+    await ctx.reply("I'm gonna try locking down that channel...")
+  else:
+    await ctx.reply("I'm gonna try locking down this channel...")
+
+  overwrite = channel.overwrites_for(ctx.guild.default_role)
+  overwrite.send_messages = False
+  await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+  await ctx.reply(f"I've locked down channel {channel}...")
+
+@bot.command()
+@command.has_permissions(kick_members=True)
+async def buttkick(ctx, member : discord.Member = None):
+  try:
+    if member is None:
+      await ctx.reply("You have to name a member, y'know?")
+    elif member.id == ctx.author.id:
+      await ctx.reply("...I am *not* doing that to you.")
+    elif member.id == bot.id:
+      await ctx.reply("...I'm not doing that to myself!")
+    else:
+      await member.kick(member, reason=reason)
+  except NotFound:
+    await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
+  except Forbidden:
+    await ctx.reply("You don't have the permission to kick a member.")
+
+@bot.command()
+@command.has_permissions(ban_members=True)
+async def banish(ctx, member : discord.Member = None, reason : str = None, seconds_messages : int = 86400):
+  try:
+    if member is None:
+      await ctx.reply("...Ban who?")
+    elif member.id == ctx.author.id:
+      await ctx.reply(f"I'm not banning you, {ctx.author.mention}.")
+    elif member.id == bot.id:
+      await ctx.reply(f"...I'm not doing that to myself?! *slap*")
+    else:
+      await member.ban(member, reason=reason)
+  except NotFound:
+    await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
+  except Forbidden:
+    await ctx.reply("You don't have the permission to ban a member.")
+  except HTTPException:
+    await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
 
 level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
