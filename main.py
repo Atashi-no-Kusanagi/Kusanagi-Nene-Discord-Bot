@@ -422,7 +422,7 @@ async def showcmds(ctx):
   
   ------------ Special commands -----------
   `KN-lock | <channel>` : I'll lock a specified channel or the channel the command was sent in
-  `KN-buttkick` <member> <reason>` : Buttkick someone from the server
+  `KN-buttkick <member> <reason>` : Buttkick someone from the server
   `KN-banish <member> <reason> <seconds worth of messages to delete>` : Send a member to hell
   `KN-awaken <member> <reason>` : Unban a member and bring them back from hell""",
       color=discord.Color.green()
