@@ -266,7 +266,7 @@ async def kiss(ctx, member: discord.Member = None):
           response_list = [
               "Oh..uhm...Well, what's wrong with a little self-love?",
               "Are you THAT single?",
-              "Wow, I feel bad for you."
+              "Wow...I feel bad for you."
           ]
           await ctx.reply(random.choice(response_list))
       else:
@@ -510,7 +510,7 @@ async def my_acc(ctx):
 
 @bot.command()
 async def bite(ctx, member : discord.Member = None):
-    if member is None or member.id == bot.id:
+    if member is None or member.id == bot.application_id:
         response_list = [
             "Oww! *Pushes you away* What was that for?!",
             f"*{ctx.author.mention} aggressively bites Nene in the arm, almost drawing blood* OWWWWWW! *She slaps them in the face and bites them back even harder, puncturing their skin* HOW ABOUT THAT?!",
@@ -586,7 +586,7 @@ async def buttkick(ctx, member : discord.Member = None):
       await ctx.reply("You have to name a member, y'know?")
     elif member.id == ctx.author.id:
       await ctx.reply("...I am *not* doing that to you.")
-    elif member.id == bot.id:
+    elif member.id == bot.application_id:
       await ctx.reply("...I'm not doing that to myself!")
     else:
       await member.kick(member, reason=reason)
@@ -603,7 +603,7 @@ async def banish(ctx, member : discord.Member = None, reason : str = None, secon
       await ctx.reply("...Ban who?")
     elif member.id == ctx.author.id:
       await ctx.reply(f"I'm not banning you, {ctx.author.mention}.")
-    elif member.id == bot.id:
+    elif member.id == bot.application_id:
       await ctx.reply("...I'm not doing that to myself?! *slap*")
     else:
       await member.ban(member, reason=reason, delete_message_seconds=seconds_messages)
@@ -622,7 +622,7 @@ async def awaken(ctx, member : discord.Member = None, reason : str = None):
         await ctx.reply("...Unban who?")
       elif member.id == ctx.author.id:
         await ctx.reply(f"...That's impossible, {ctx.author.mention}.")
-      elif member.id == bot.id:
+      elif member.id == bot.application_id:
         await ctx.reply("I can't do that...because I'm not banned.")
       else:
         await member.unban(member, reason=reason)
