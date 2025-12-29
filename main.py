@@ -70,6 +70,9 @@ TOKEN_KEY = os.getenv("KUSANAGI_APIKEY")
 cuddle_cooldown = 30
 last_cuddle = 0
 
+nuzzle_cooldown = 45
+last_nuzzle = 0
+
 kiss_cooldown = 120
 last_kiss = 0
 
@@ -237,6 +240,27 @@ async def cuddle(ctx):
       await ctx.send(xp_level_up)
 
 @bot.command()
+async def nuzzle(ctx):
+  global last_nuzzle, xp, level, full_xp
+  xp_level_up = None
+
+  response_list = [""]
+
+  new_nuzzle = time.time()
+
+  if cooldown_ready(last_nuzzle, nuzzle_cooldown):
+    xp += random.randint(6, 7)
+
+    compute_if_full()
+    xp_level_up = f"XP UP! (Level {level}, {xp}/{full_xp}")
+
+  last_nuzzle = new_nuzzle
+  await ctx.send(random.choice(response_list))
+
+  if xp_level_up:
+    await ctx.send(xp_level_up)
+  
+@bot.command()
 async def kiss(ctx, member: discord.Member = None):
   global last_kiss, xp, level, full_xp
   xp_level_up = None
@@ -281,6 +305,37 @@ async def kiss(ctx, member: discord.Member = None):
       await ctx.send(f"Hah, kiss yourself, {ctx.author.mention}!")
 
 @bot.command()
+async def lick(ctx, member : discord.Member = None):
+  if member is None or member.id == bot.application_id:
+    response_list = [
+      f"Ah, what the hell?! *She pushes {ctx.author.mention} away from her as she brushed her arm against her skirt,* What's wrong with you?!",
+      "Uhm...what are you doing?"
+    ]
+    await ctx.send(random.choice(response_list))
+  elif member.id == ctx.author.id:
+    response_list = [
+      "Uh huh...you do you, I guess.",
+      "...Do you need water as well?",
+      "..That's nice..."
+    ]
+    await ctx.send(random.choice(response_list))
+  else:
+    response_list = [
+      "Uh, I won't judge! I, uh...",
+      f"*Her gaze fell upon {ctx.author.mention} and {member.mention} as they licked each other aggressively, making all kinds of different, weird sounds.* Do you guys need help?",
+      "Woah...that's nice. I mean...just not in public...please?"
+    ]
+    await ctx.send(random.choice(response_list))
+
+@bot.command()
+async def backflip(ctx):
+  response_list = [
+    "...A backflip? I mean, I guess I could try... *Her body flicked around as her arms spread and she flipped, landing perfectly on the ground...head first.* Ugh...l-like this?",
+    "I don't think I can do a backflip like how Emu can...but... *Tries a backflip* Is this how you do one?"
+  ]
+  await ctx.send(random.choice(response_list))
+
+@bot.command()
 async def hug(ctx):
   global last_hug, xp, level, full_xp
   xp_level_up = None
@@ -306,6 +361,47 @@ async def hug(ctx):
       await ctx.send(xp_level_up)
 
 @bot.command()
+async def motorboat(ctx, member : discord.Member = None):
+  try:
+    if Member is None or member.id == bot.application_id:
+      response_list = [
+        f"...Why are you giving me a motorboat, {ctx.author.mention}?",
+        ""
+      ]
+      await ctx.send(random.choice(response_list))
+    elif member.id == ctx.author.id:
+      response_list = [
+        "Cool, you're rich. We get it...",
+        ""
+      ]
+      await ctx.send(random.choice(response_list))
+    else:
+      response_list = [
+        f"*Her phone shot up, off of her hand as a motorboat rocketed past her. The phone ate every grain of sand that it touched, mutating into an evil anti-motorboat device. It seems like it'll protect her from future motorboats from now on, especially those from {ctx.author.mention}.*"
+      ]
+      await ctx.send(random.choice(response_list))
+  except (TypeError, CommandInvokeError):
+    await ctx.send("Uhm...are you seriously licking that pole?")
+
+@bot.command()
+async def date(ctx):
+  response_list = [
+    "*Her head turned to you as she muttered,* ...Probably isn't talking to me...",
+    "I...me?...I mean...if you really want to...then, okay."
+    "You want to date...me? Uhh...I...I don't think I can process this...right now, I'm sorry..."
+  ]
+  await ctx.reply(random.choice(response_list))
+
+@bot.command()
+async def meow(ctx):
+  response_list = [
+    "Awww...who's a good kitty? Whooo's a good, good kitty?",
+    "Cute kitty...*She pulls you by the neck and scratches your head,* Kitty, kitty cat...",
+    "Hmm...*She takes you by the back and carries you in her arms,* Surely nothing bad will happen if I take you home, right?"
+  ]
+  await ctx.reply(random.choice(response_list))
+      
+@bot.command()
 async def slap(ctx, member: discord.Member = None):
   try:
       if member is None or member.id == bot.application_id:
@@ -330,7 +426,7 @@ async def slap(ctx, member: discord.Member = None):
           await ctx.send(random.choice(response_list))
 
   except (TypeError, CommandInvokeError):
-      ctx.send(f"...Did you mean to hit me? Who's {member}?")
+      await ctx.send(f"...Did you mean to hit me? Who's {member}?")
 
 @bot.command()
 async def headpat(ctx):
