@@ -27,7 +27,6 @@ if not TOKEN:
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-supabase: Client | None = None
 
 if SUPABASE_URL and SUPABASE_KEY:
     try:
@@ -363,7 +362,7 @@ async def hug(ctx):
 @bot.command()
 async def motorboat(ctx, member : discord.Member = None):
   try:
-    if Member is None or member.id == bot.application_id:
+    if member is None or member.id == bot.application_id:
       response_list = [
         f"...Why are you giving me a motorboat, {ctx.author.mention}?",
         ""
@@ -387,7 +386,7 @@ async def motorboat(ctx, member : discord.Member = None):
 async def date(ctx):
   response_list = [
     "*Her head turned to you as she muttered,* ...Probably isn't talking to me...",
-    "I...me?...I mean...if you really want to...then, okay."
+    "I...me?...I mean...if you really want to...then, okay.",
     "You want to date...me? Uhh...I...I don't think I can process this...right now, I'm sorry..."
   ]
   await ctx.reply(random.choice(response_list))
@@ -685,7 +684,8 @@ async def buttkick(ctx, member : discord.Member = None):
     elif member.id == bot.application_id:
       await ctx.reply("...I'm not doing that to myself!")
     else:
-      await member.kick(member, reason=reason)
+      await member.kick(reason=reason)
+      await ctx.reply("Buttkicked them!")
   except NotFound:
     await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
   except Forbidden:
@@ -702,7 +702,8 @@ async def banish(ctx, member : discord.Member = None, reason : str = None, secon
     elif member.id == bot.application_id:
       await ctx.reply("...I'm not doing that to myself?! *slap*")
     else:
-      await member.ban(member, reason=reason, delete_message_seconds=seconds_messages)
+      await member.ban(reason=reason, delete_message_seconds=seconds_messages)
+      await ctx.reply("I've banned them now.")
   except NotFound:
     await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
   except Forbidden:
@@ -721,7 +722,8 @@ async def awaken(ctx, member : discord.Member = None, reason : str = None):
       elif member.id == bot.application_id:
         await ctx.reply("I can't do that...because I'm not banned.")
       else:
-        await member.unban(member, reason=reason)
+        await member.unban(reason=reason)
+        await ctx.reply("Done!")
     except NotFound:
       await ctx.reply(f"That member doesn't exist, {ctx.author.mention}")
     except Forbidden:
