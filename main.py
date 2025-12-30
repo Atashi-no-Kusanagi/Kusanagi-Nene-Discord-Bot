@@ -251,7 +251,7 @@ async def nuzzle(ctx):
     xp += random.randint(6, 7)
 
     compute_if_full()
-    xp_level_up = f"XP UP! (Level {level}, {xp}/{full_xp}")
+    xp_level_up = f"XP UP! (Level {level}, {xp}/{full_xp})"
 
   last_nuzzle = new_nuzzle
   await ctx.send(random.choice(response_list))
