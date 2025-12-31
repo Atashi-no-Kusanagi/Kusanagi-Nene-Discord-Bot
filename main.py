@@ -365,18 +365,19 @@ async def motorboat(ctx, member : discord.Member = None):
     if member is None or member.id == bot.application_id:
       response_list = [
         f"...Why are you giving me a motorboat, {ctx.author.mention}?",
-        ""
+        "...Uhm, thank you for the boat!...?"
       ]
       await ctx.send(random.choice(response_list))
     elif member.id == ctx.author.id:
       response_list = [
         "Cool, you're rich. We get it...",
-        ""
+        "You just have a random boat on the road? Alright..."
       ]
       await ctx.send(random.choice(response_list))
     else:
       response_list = [
-        f"*Her phone shot up, off of her hand as a motorboat rocketed past her. The phone ate every grain of sand that it touched, mutating into an evil anti-motorboat device. It seems like it'll protect her from future motorboats from now on, especially those from {ctx.author.mention}.*"
+        f"*Her phone shot up, off of her hand as a motorboat rocketed past her. The phone ate every grain of sand that it touched, mutating into an evil anti-motorboat device. It seems like it'll protect her from future motorboats from now on, especially those from {ctx.author.mention}.*",
+        "Her ears rang as a motorboat passed just six inches away from her, she swore she went deaf.*
       ]
       await ctx.send(random.choice(response_list))
   except (TypeError, CommandInvokeError):
@@ -501,6 +502,7 @@ async def showcmds(ctx):
   embed = discord.Embed(
       title="I have a little bit of commands you can run, here:",
       description="""
+  **"Nene Interactions"**
   `KN-cuddle` : Uhm...who put this here?
   `KN-kiss (<member>)` : Kiss a member here or leave it empty to, uhh...
   `KN-hug` : Hug me.
@@ -508,15 +510,24 @@ async def showcmds(ctx):
   `KN-headpat` : Headpat me, but I am NOT a pet!
   `KN-bite (<member>)` : Bite someone, or me.
   `KN-ily` : ...Uhm...
-  `KN-birthday (<member> <when>)` : Tell me when a member's birthday is, or wish me a happy birthday!
-  `KN-stats` : See my stats (level, xp/max level xp)
+  `KN-motorboat (<member>)` : Give someone (or me) a motorboat...?
+  `KN-date` : ...?
+  `KN-meow` : Meow for me.
+  `KN-backflip` : Make me do a backflip
+  `KN-nuzzle` : Are you sleepy?
+
+  **"Money/Finances"**
   `KN-coinflip <bet> <pick>` : Do a coinflip; winning doubles your bet
   `KN-make_acc` : Register a new unique account
   `KN-my_acc` : View your account (after registering!)
   `KN-pay <member> <amount>` : Pay someone <amount> Nenebucks!
+
+  **"Misc."**
+  `KN-birthday (<member> <when>)` : Tell me when a member's birthday is, or wish me a happy birthday!
+  `KN-stats` : See my stats (level, xp/max level xp)
   
   ------------ Special commands -----------
-  `KN-lock | <channel>` : I'll lock a specified channel or the channel the command was sent in
+  `KN-lock (<channel>)` : I'll lock a specified channel or the channel the command was sent in
   `KN-buttkick <member> <reason>` : Buttkick someone from the server
   `KN-banish <member> <reason> <seconds worth of messages to delete>` : Send a member to hell
   `KN-awaken <member> <reason>` : Unban a member and bring them back from hell""",
