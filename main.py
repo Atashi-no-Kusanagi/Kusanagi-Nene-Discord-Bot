@@ -765,7 +765,7 @@ async def about_knene(ctx):
         however, due to current LM limitations, the data KNene is trained off of is **extremely** insufficient, which is why KNene <1.0 prints gibberish.
         KNene's training data and training time will be expanded more as it is developed.
         
-        For more information about KNene, use KN-knene_specs.""")
+        For more information about KNene, use KN-knene_specs."""),
         color=discord.Color.green()
     )
     await ctx.reply(embed=embed)
