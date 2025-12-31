@@ -746,9 +746,9 @@ level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
 
 if __name__ == '__main__':
-    #if ENABLE_HEALTH:
-        #_start_flask_in_thread()
-        #print("Health endpoint enabled — remember to set ENABLE_HEALTH_SERVER=1 in Render and use an external pinger to hit health")
+    if ENABLE_HEALTH:
+        _start_flask_in_thread()
+        print("Health endpoint enabled — remember to set ENABLE_HEALTH_SERVER=1 in Render and use an external pinger to hit health")
 
     if not TOKEN:
         print("Missing token. Exiting.")
