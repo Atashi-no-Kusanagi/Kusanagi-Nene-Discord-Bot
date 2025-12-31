@@ -377,7 +377,7 @@ async def motorboat(ctx, member : discord.Member = None):
     else:
       response_list = [
         f"*Her phone shot up, off of her hand as a motorboat rocketed past her. The phone ate every grain of sand that it touched, mutating into an evil anti-motorboat device. It seems like it'll protect her from future motorboats from now on, especially those from {ctx.author.mention}.*",
-        "Her ears rang as a motorboat passed just six inches away from her, she swore she went deaf.*
+        "*Her ears rang as a motorboat passed just six inches away from her, she swore she went deaf.*"
       ]
       await ctx.send(random.choice(response_list))
   except (TypeError, CommandInvokeError):
