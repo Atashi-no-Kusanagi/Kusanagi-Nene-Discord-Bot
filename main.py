@@ -525,6 +525,12 @@ async def showcmds(ctx):
   **"Misc."**
   `KN-birthday (<member> <when>)` : Tell me when a member's birthday is, or wish me a happy birthday!
   `KN-stats` : See my stats (level, xp/max level xp)
+
+  **"KNene"**
+  `KN-ask` : Ask KNene (hey, remember, it will NOT produce anything good, okay?)
+  `KN-about_knene` : Ask what KNene is about
+  `KN-knene_specs` : See KNene's specs
+  ***!! KNene is not available since it is not ready for production yet.***
   
   ------------ Special commands -----------
   `KN-lock (<channel>)` : I'll lock a specified channel or the channel the command was sent in
@@ -741,6 +747,55 @@ async def awaken(ctx, member : discord.Member = None, reason : str = None):
       await ctx.reply("You don't have the permission to ban a member.")
     except HTTPException:
       await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
+
+@bot.command()
+async def ask(ctx, question : str = None):
+    if question is None:
+        await ctx.reply("You can't ask KNene nothing!")
+    else:
+        await ctx.reply(f"Sorry, {ctx.author.mention}, but you can't ask KNene anything yet.")
+
+@bot.command()
+async def about_knene(ctx):
+    embed = discord.Embed(
+        title="About KNene (as of December 31, 2025)",
+        description="""
+        KNene is a multi-transformer block language model (LM) developed by @transmascneneisreal with assistance of ChatGPT.
+        KNene is trained off of data about 9500+ words long and uses multiple writing examples (encyclopedic, dialogue, storywriting, etc.),
+        however, due to current LM limitations, the data KNene is trained off of is **extremely** insufficient, which is why KNene <1.0 prints gibberish.
+        KNene's training data and training time will be expanded more as it is developed.
+        
+        For more information about KNene, use KN-knene_specs.""")
+        color=discord.Color.green()
+    )
+    await ctx.reply(embed=embed)
+
+@bot.command()
+async def knene_specs(ctx):
+    embed = discord.Embed(
+        title="KNene K0.4.7 specifications",
+        description="""
+        Training data size: ~8758 words
+        Epochs trained: 3000-5000
+        Embeddings dimensions: 48
+        Transformer blocks: 2
+        Heads: 8
+        Weights: 2
+        Hidden neurons per weight: 192
+
+        Training data: The data that KNene learns from in order to produce new data
+        Epochs: How many times KNene was passed through all of the data
+        Embedding dimensions: Basically, how much "meaning" a token (the numerical conversion of text) can store
+        Transformer blocks: How many transformer blocks (KNene's brain) there are
+        Heads: Heads are the things that focus on different parts of the training data and are added together to provide richer representation and faster (?) training
+        Weights: What is being adjusted by KNene to lower differences as much as possible
+        Hidden neurons: Processes text
+
+        Includes weight tying, attention, but no memory (no recollection of past chats)""",
+        color=discord.Color.green()
+    )
+    await ctx.reply(embed=embed)
+        
 
 level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
