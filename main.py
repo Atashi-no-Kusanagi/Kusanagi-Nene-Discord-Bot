@@ -316,7 +316,9 @@ async def on_ready():
           "Ugh...I'm awake...I'm awake!...",
           "Ahh...good morning...or afternoon...or night, actually, what time is it?",
           "What are you doing in my room?!",
-          "Hey, what's happening?"]
+          "Hey, what's happening?",
+          "Mmmh...who woke me up?",
+          "Can't I get five more minutes, please?"]
       msg_to_send = random.choice(response_list)
       await channel.send(msg_to_send)
 
@@ -340,7 +342,7 @@ async def on_member_join(member):
   else:
       member_last30 += 1
       
-@bot.tree.command(name="Sleep", description="Forces Nene into a graceful (shutdown) sleep.")
+@bot.command()
 @commands.has_permissions(administrator=True)
 async def sleep(ctx):
   response_list = [
@@ -354,7 +356,7 @@ async def sleep(ctx):
 
   await bot.close()
 
-@bot.tree.command(name="Cuddle", description="Cuddle with Nene")
+@bot.command()
 async def cuddle(ctx):
   global last_cuddle, xp, level, full_xp
   xp_level_up = None
@@ -378,7 +380,7 @@ async def cuddle(ctx):
   if xp_level_up:
       await ctx.send(xp_level_up)
 
-@bot.tree.command(name="Nuzzle", description="Nuzzle into Nene's shoulder")
+@bot.command()
 async def nuzzle(ctx):
   global last_nuzzle, xp, level, full_xp
   xp_level_up = None
@@ -403,7 +405,7 @@ async def nuzzle(ctx):
   if xp_level_up:
     await ctx.send(xp_level_up)
   
-@bot.tree.command(name="Kiss", description="Kiss Nene (or another member)")
+@bot.command()
 async def kiss(ctx, member: discord.Member = None):
   global last_kiss, xp, level, full_xp
   xp_level_up = None
@@ -447,7 +449,7 @@ async def kiss(ctx, member: discord.Member = None):
   except (TypeError, CommandInvokeError):
       await ctx.send(f"Hah, kiss yourself, {ctx.author.mention}!")
 
-@bot.tree.command(name="Lick", description="...Lick Nene (or another member)?")
+@bot.command()
 async def lick(ctx, member : discord.Member = None):
   if member is None or member.id == bot.application_id:
     response_list = [
@@ -470,7 +472,7 @@ async def lick(ctx, member : discord.Member = None):
     ]
     await ctx.send(random.choice(response_list))
 
-@bot.tree.command(name="Backflip", description="Force Nene to perform a backflip")
+@bot.command()
 async def backflip(ctx):
   response_list = [
     "...A backflip? I mean, I guess I could try... *Her body flicked around as her arms spread and she flipped, landing perfectly on the ground...head first.* Ugh...l-like this?",
@@ -478,7 +480,7 @@ async def backflip(ctx):
   ]
   await ctx.send(random.choice(response_list))
 
-@bot.tree.command(name="Hug", description="Hug Nene")
+@bot.command()
 async def hug(ctx):
   global last_hug, xp, level, full_xp
   xp_level_up = None
@@ -503,7 +505,7 @@ async def hug(ctx):
   if xp_level_up:
       await ctx.send(xp_level_up)
 
-@bot.tree.command(name="Motorboat", description="Give Nene (or someone else) a motorboat")
+@bot.command()
 async def motorboat(ctx, member : discord.Member = None):
   try:
     if member is None or member.id == bot.application_id:
@@ -527,7 +529,7 @@ async def motorboat(ctx, member : discord.Member = None):
   except (TypeError, CommandInvokeError):
     await ctx.send("Uhm...are you seriously licking that pole?")
 
-@bot.tree.command(name="Date", description="Ask Nene out on a date.")
+@bot.command()
 async def date(ctx):
   response_list = [
     "*Her head turned to you as she muttered,* ...Probably isn't talking to me...",
@@ -536,7 +538,7 @@ async def date(ctx):
   ]
   await ctx.reply(random.choice(response_list))
 
-@bot.tree.command(name="Meow", description="Meow for Nene.")
+@bot.command()
 async def meow(ctx):
   response_list = [
     "Awww...who's a good kitty? Whooo's a good, good kitty?",
@@ -545,7 +547,7 @@ async def meow(ctx):
   ]
   await ctx.reply(random.choice(response_list))
       
-@bot.tree.command(name="Slap", description="Slap Nene (or another member)")
+@bot.command()
 async def slap(ctx, member: discord.Member = None):
   try:
       if member is None or member.id == bot.application_id:
@@ -572,7 +574,7 @@ async def slap(ctx, member: discord.Member = None):
   except (TypeError, CommandInvokeError):
       await ctx.send(f"...Did you mean to hit me? Who's {member}?")
 
-@bot.tree.command(name="Headpat", description="Headpat Nene")
+@bot.command()
 async def headpat(ctx):
   global last_headpat, xp, level, full_xp
   xp_level_up = None
@@ -599,7 +601,7 @@ async def headpat(ctx):
   if xp_level_up:
       await ctx.send(xp_level_up)
 
-@bot.tree.command(name="I love you", description="Tell Nene that you love her.")
+@bot.command()
 async def ily(ctx):
     response_list = [
         "I love you too!!",
@@ -608,7 +610,7 @@ async def ily(ctx):
     ]
     await ctx.reply(random.choice(response_list))
 
-@bot.tree.command(name="Birthday", description="Tell Nene that a member is having a birthday or wish her a happy birthday")
+@bot.command()
 async def birthday(ctx, member : discord.Member = None, days : int = None):
   try:
       if not member or member.id == bot.application_id:
@@ -636,12 +638,12 @@ async def birthday(ctx, member : discord.Member = None, days : int = None):
   except (TypeError, CommandInvokeError):
       await ctx.send(f"Uhm...Sorry, I don't know who {member} is...")
 
-@bot.tree.command(name="Stats", description="Get Nene's stats")
+@bot.command()
 async def stats(ctx):
   global level, xp, full_xp
   await ctx.send(f"Hmm...I'm on level {level} with {xp} XP out of {full_xp} XP...Seems too low, don't you think?")
 
-@bot.tree.command(name="Show commands", description="Get commands")
+@bot.command()
 async def showcmds(ctx):
   embed = discord.Embed(
       title="I have a little bit of commands you can run, here:",
@@ -685,7 +687,7 @@ async def showcmds(ctx):
   )
   await ctx.send(embed=embed)
 
-@bot.tree.command(name="Coinflip", description="Heads or tails?")
+@bot.command()
 async def coinflip(ctx, bet : int, pick):
     current_bal = get_balance(ctx.author.id)
 
@@ -728,7 +730,7 @@ async def coinflip(ctx, bet : int, pick):
     else:
         await ctx.reply("You don't have enough Nenebucks for that bet!")
 
-@bot.tree.command(name="Make account", description="Register an account and get 10 free Nenebucks.")
+@bot.command()
 async def make_acc(ctx):
     balance = get_balance(ctx.author.id) 
     
@@ -744,7 +746,7 @@ async def make_acc(ctx):
         else:
             await ctx.reply("Oops...something happened, and I **couldn't create your account**. Can you try again?")
 
-@bot.tree.command(name="My account", description="View your account statement")
+@bot.command()
 async def my_acc(ctx):
     balance = get_balance(ctx.author.id)
 
@@ -764,7 +766,7 @@ async def my_acc(ctx):
         await ctx.reply(f"*She alternates from flipping through the files and licking her fingers* Hmm...I can't find a \"{ctx.author}\" here...**Try making an account with KN-make_acc.**")
 
 
-@bot.tree.command(name="Bite", description="Bite Nene or another member.")
+@bot.command()
 async def bite(ctx, member : discord.Member = None):
     if member is None or member.id == bot.application_id:
         response_list = [
@@ -788,7 +790,7 @@ async def bite(ctx, member : discord.Member = None):
         ]
         await ctx.send(random.choice(response_list))
 
-@bot.tree.command(name="Pay", description="Pay a member money")
+@bot.command()
 async def pay(ctx, member : discord.Member = None, amount : int = 1):
     if member is None:
         await ctx.reply("You need to mention someone to pay!")
@@ -819,7 +821,7 @@ async def pay(ctx, member : discord.Member = None, amount : int = 1):
 
     await ctx.reply("I've completed your transfer! But just to be sure, please, view your account using *KN-my_acc*.")
 
-@bot.tree.command(name="Lock", description="Lock a channel or leave channel parameter blank to mute this channel")
+@bot.command()
 @commands.has_permissions(manage_channels=True)
 async def lock(ctx, channel_to_lock : discord.TextChannel = None):
   channel = channel_to_lock or ctx.channel
@@ -834,7 +836,7 @@ async def lock(ctx, channel_to_lock : discord.TextChannel = None):
   await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
   await ctx.reply(f"I've locked down channel {channel}...")
 
-@bot.tree.command(name="Buttkick", description="Kick someone, same as in builtin command")
+@bot.command()
 @commands.has_permissions(kick_members=True)
 async def buttkick(ctx, member : discord.Member = None):
   try:
@@ -852,7 +854,7 @@ async def buttkick(ctx, member : discord.Member = None):
   except Forbidden:
     await ctx.reply("You don't have the permission to kick a member.")
 
-@bot.tree.command(name="Banish", description="Banish a member into hell.")
+@bot.command()
 @commands.has_permissions(ban_members=True)
 async def banish(ctx, member : discord.Member = None, reason : str = None, seconds_messages : int = 86400):
   try:
@@ -872,7 +874,7 @@ async def banish(ctx, member : discord.Member = None, reason : str = None, secon
   except HTTPException:
     await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
 
-@bot.tree.command(name="Awaken", description="Unban someone")
+@bot.command()
 @commands.has_permissions(ban_members=True)
 async def awaken(ctx, member : discord.Member = None, reason : str = None):
     try:
@@ -892,29 +894,28 @@ async def awaken(ctx, member : discord.Member = None, reason : str = None):
     except HTTPException:
       await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
 
-@bot.tree.command(name="Ask KNene", description="Ask KNene and it will provide an answer.")
-async def ask(ctx, question : str = None):
-    if question is None:
-        await ctx.reply("You can't ask KNene nothing!")
-    else:
-        await ctx.response.defer()
+@bot.command()
+async def ask(ctx, *, question: str = None):
+    if not question:
+        await ctx.send("You can’t ask KNene nothing!")
+        return
 
-        loop = asyncio.get_running_loop()
-        reply = await loop.run_in_executor(
+    loop = asyncio.get_running_loop()
+    reply = await loop.run_in_executor(
         None,
         generate_text,
         model,
         merges,
         word_to_ix,
         ix_to_word,
-        prompt,
-        length=75,
-        temperature=0.8
+        question,
+        75,
+        0.7
     )
 
-    await interaction.followup.send(reply)
-
-@bot.tree.command(name="About KNene", description="See what KNene is about.")
+    await ctx.send(reply[:1900])
+    
+@bot.command()
 async def about_knene(ctx):
     embed = discord.Embed(
         title="About KNene (as of December 31, 2025)",
@@ -929,7 +930,7 @@ async def about_knene(ctx):
     )
     await ctx.reply(embed=embed)
 
-@bot.tree.command(name="KNene specs", description="View KNene's specifications")
+@bot.command()
 async def knene_specs(ctx):
     embed = discord.Embed(
         title="KNene K0.5 specifications",
