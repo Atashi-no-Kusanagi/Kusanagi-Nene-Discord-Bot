@@ -4,4 +4,3 @@ supabase
 flask
 aiohttp
 gunicorn
-numpy
