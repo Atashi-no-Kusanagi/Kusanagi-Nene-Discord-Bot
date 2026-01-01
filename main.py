@@ -183,6 +183,12 @@ def load_model(path):
 
     return model, merges, word_to_ix, ix_to_word
 
+def normalize(text):
+    text = text.replace("“", "\"").replace("”", "\"")
+    text = text.replace("‘", "'").replace("’", "'")
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
 print("🧠 Loading model...")
 model, merges, word_to_ix, ix_to_word = load_model("KNene-K0.5.npz")
 print("✅ Model loaded")
