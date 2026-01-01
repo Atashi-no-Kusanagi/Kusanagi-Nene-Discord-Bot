@@ -3,8 +3,6 @@ import time
 import random
 import json
 import asyncio
-import re
-import numpy as np
 from datetime import date
 
 import discord
@@ -158,151 +156,6 @@ def compute_if_full():
 
 def cooldown_ready(last_time, cooldown):
   return time.time() - last_time >= cooldown
-
-def load_model(path):
-    data = np.load(path, allow_pickle=True)
-
-    model = {}
-    model['E'] = data['E']
-    model['b_out'] = data['b_out']
-    model['pos_embed'] = data['pos_embed']
-
-    merges = data['merges'].tolist()
-    word_to_ix = data['word_to_ix'].item()
-    ix_to_word = data['ix_to_word'].item()
-
-    block_ids = sorted(
-        int(k.split('_')[1]) for k in data.keys() if k.startswith("W1_")
-    )
-
-    for i in block_ids:
-        model[f'W1_{i}'] = data[f'W1_{i}']
-        model[f'W2_{i}'] = data[f'W2_{i}']
-        model[f'WQ{i}'] = data[f'WQ{i}']
-        model[f'WK{i}'] = data[f'WK{i}']
-        model[f'WV{i}'] = data[f'WV{i}']
-
-    return model, merges, word_to_ix, ix_to_word
-
-def normalize(text):
-    text = text.replace("“", "\"").replace("”", "\"")
-    text = text.replace("‘", "'").replace("’", "'")
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
-
-print("🧠 Loading model...")
-model, merges, word_to_ix, ix_to_word = load_model("KNene-K0.5.npz")
-print("✅ Model loaded")
-
-num_blocks = 2
-num_heads = 8
-
-def encode_text(text, merges, vocab, add_bos=True, add_eos=True):
-    token_ids = []
-
-    if add_bos:
-        token_ids.append(vocab["<BOS>"])
-
-    for word in text.split():
-        if word in vocab:
-            token_ids.append(vocab[word])
-        else:
-            for sw in bpe_encode_word(word, merges):
-                token_ids.append(vocab.get(sw, vocab["<UNK>"]))
-
-    if add_eos:
-        token_ids.append(vocab["<EOS>"])
-
-    return np.array(token_ids, dtype=np.int64)
-
-def forward_stacked(model, x_idx, num_blocks=num_blocks, num_heads=num_heads, return_cache=True):
-    B, T = x_idx.shape
-    D = model['E'].shape[1]
-
-    X = model['E'][x_idx] + model['pos_embed'][:T]
-    cache_blocks = []
-
-    for i in range(num_blocks):
-        WQ, WK, WV = model[f'WQ{i}'], model[f'WK{i}'], model[f'WV{i}']
-        W1, W2 = model[f'W1_{i}'], model[f'W2_{i}']
-        
-        X_att_in = X.copy()
-        A, weights, Q, K, V = multi_head_attention(X_att_in, WQ, WK, WV, num_heads=num_heads)
-
-        X1 = layer_norm(X + A)
-        H_pre = X1 @ W1
-        H_act = relu(H_pre)
-        F = H_act @ W2
-        X = layer_norm(X1 + F)
-
-        if return_cache:
-            cache_blocks.append({
-            'X0': X_att_in,
-            'X1': X1,
-            'H_pre': H_pre,
-            'H_act': H_act,
-            'A': A,
-            'Q': Q,
-            'K': K,
-            'V': V,
-            'weights': weights,
-            'W1': W1,
-            'W2': W2,
-            'WQ': WQ,
-            'WK': WK,
-            'WV': WV,
-            'X_att_in': X_att_in,
-            'X_final': X
-        })
-
-    logits = X @ model['E'].T + model['b_out']
-    probs = softmax(logits)
-    return probs, cache_blocks if return_cache else None
-
-def generate_text(
-    model,
-    merges,
-    word_to_ix,
-    ix_to_word,
-    start,
-    length=75,
-    temperature=0.7
-):
-    start = normalize(start)
-
-    token_stream = encode_text(
-        start, merges, word_to_ix,
-        add_bos=True, add_eos=False
-    ).tolist()
-
-    seq_len = model['pos_embed'].shape[0]
-
-    for _ in range(length):
-        context = np.array(
-            [token_stream[-seq_len:]],
-            dtype=np.int64
-        )
-
-        probs, _ = forward_stacked(model, context, return_cache=False)
-        probs = probs[0, -1]
-
-        probs = np.log(probs + 1e-9) / temperature
-        probs = np.exp(probs)
-
-        if not np.isfinite(probs).all():
-            probs = np.ones_like(probs)
-
-        probs = np.clip(probs, 1e-9, 1.0)
-        probs /= probs.sum()
-
-        next_id = np.random.choice(len(probs), p=probs)
-        token_stream.append(next_id)
-
-        if next_id == word_to_ix["<EOS>"]:
-            break
-
-    text = decode_tokens(token_stream, ix_to_word)
-    return text[:1900]
 
 @tasks.loop(seconds=30)
 async def refresh_threshold():
@@ -679,12 +532,6 @@ async def showcmds(ctx):
   `KN-birthday (<member> <when>)` : Tell me when a member's birthday is, or wish me a happy birthday!
   `KN-stats` : See my stats (level, xp/max level xp)
 
-  **"KNene"**
-  `KN-ask` : Ask KNene (hey, remember, it will NOT produce anything good, okay?)
-  `KN-about_knene` : Ask what KNene is about
-  `KN-knene_specs` : See KNene's specs
-  ***KNene older than version 6.7 will not produce coherent results as its dataset is too small.***
-  
   ------------ Special commands -----------
   `KN-lock (<channel>)` : I'll lock a specified channel or the channel the command was sent in
   `KN-buttkick <member> <reason>` : Buttkick someone from the server
@@ -900,69 +747,6 @@ async def awaken(ctx, member : discord.Member = None, reason : str = None):
       await ctx.reply("You don't have the permission to ban a member.")
     except HTTPException:
       await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
-
-@bot.command()
-async def ask(ctx, *, question: str = None):
-    if not question:
-        await ctx.send("You can’t ask KNene nothing!")
-        return
-
-    loop = asyncio.get_running_loop()
-    reply = await loop.run_in_executor(
-        None,
-        generate_text,
-        model,
-        merges,
-        word_to_ix,
-        ix_to_word,
-        question,
-        75,
-        0.7
-    )
-
-    await ctx.send(reply[:1900])
-    
-@bot.command()
-async def about_knene(ctx):
-    embed = discord.Embed(
-        title="About KNene (as of December 31, 2025)",
-        description="""
-        KNene is a multi-transformer block language model (LM) developed by @transmascneneisreal with assistance of ChatGPT.
-        KNene is trained off of data about 9500+ words long and uses multiple writing examples (encyclopedic, dialogue, storywriting, etc.),
-        however, due to current LM limitations, the data KNene is trained off of is **extremely** insufficient, which is why KNene <6.7 prints gibberish.
-        KNene's training data and training time will be expanded more as it is developed.
-        
-        For more information about KNene, use KN-knene_specs.""",
-        color=discord.Color.green()
-    )
-    await ctx.reply(embed=embed)
-
-@bot.command()
-async def knene_specs(ctx):
-    embed = discord.Embed(
-        title="KNene K0.5 specifications",
-        description="""
-        Training data size: ~9225 words, 11000-23000 tokens
-        Epochs trained: 100
-        Embeddings dimensions: 48
-        Transformer blocks: 2
-        Heads: 8
-        Weights: 2
-        Hidden neurons per weight: 192
-
-        Training data: The data that KNene learns from in order to produce new data
-        Epochs: How many times KNene was passed through all of the data
-        Embedding dimensions: Basically, how much "meaning" a token (the numerical conversion of text) can store
-        Transformer blocks: How many transformer blocks (KNene's brain) there are
-        Heads: Heads are the things that focus on different parts of the training data and are added together to provide richer representation and faster (?) training
-        Weights: What is being adjusted by KNene to lower differences as much as possible
-        Hidden neurons: Processes text
-
-        Includes weight tying, attention, but no memory (no recollection of past chats)""",
-        color=discord.Color.green()
-    )
-    await ctx.reply(embed=embed)
-        
 
 level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
