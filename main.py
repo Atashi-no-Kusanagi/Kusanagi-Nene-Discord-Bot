@@ -187,6 +187,9 @@ print("🧠 Loading model...")
 model, merges, word_to_ix, ix_to_word = load_model("KNene-K0.5.npz")
 print("✅ Model loaded")
 
+num_blocks = 2
+num_heads = 8
+
 def encode_text(text, merges, vocab, add_bos=True, add_eos=True):
     token_ids = []
 
