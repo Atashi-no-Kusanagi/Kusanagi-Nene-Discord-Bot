@@ -157,6 +157,35 @@ def compute_if_full():
 def cooldown_ready(last_time, cooldown):
   return time.time() - last_time >= cooldown
 
+def load_model(path):
+    data = np.load(path, allow_pickle=True)
+
+    model = {}
+    model['E'] = data['E']
+    model['b_out'] = data['b_out']
+    model['pos_embed'] = data['pos_embed']
+
+    merges = data['merges'].tolist()
+    word_to_ix = data['word_to_ix'].item()
+    ix_to_word = data['ix_to_word'].item()
+
+    block_ids = sorted(
+        int(k.split('_')[1]) for k in data.keys() if k.startswith("W1_")
+    )
+
+    for i in block_ids:
+        model[f'W1_{i}'] = data[f'W1_{i}']
+        model[f'W2_{i}'] = data[f'W2_{i}']
+        model[f'WQ{i}'] = data[f'WQ{i}']
+        model[f'WK{i}'] = data[f'WK{i}']
+        model[f'WV{i}'] = data[f'WV{i}']
+
+    return model, merges, word_to_ix, ix_to_word
+
+print("🧠 Loading model...")
+model, merges, word_to_ix, ix_to_word = load_model("KNene-K0.5.npz")
+print("✅ Model loaded")
+
 def encode_text(text, merges, vocab, add_bos=True, add_eos=True):
     token_ids = []
 
@@ -875,8 +904,8 @@ async def ask(ctx, question : str = None):
         word_to_ix,
         ix_to_word,
         prompt,
-        75,
-        0.7
+        length=75,
+        temperature=0.8
     )
 
     await interaction.followup.send(reply)
