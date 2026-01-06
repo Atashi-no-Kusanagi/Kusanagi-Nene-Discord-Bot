@@ -207,11 +207,12 @@ async def on_member_join(member):
 
 @bot.event
 async def on_message_join(message):
-    if message.content in censored_text:
-        try:
-            await message.delete()
-        except Exception as err:
-            print(f"Error while deleting message, \"{message.content}\", {err}")
+    for word in message.content:
+        if word in censored_text:
+            try:
+                await message.delete()
+            except Exception as error:
+                print(error)
     
       
 @bot.command()
