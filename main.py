@@ -95,6 +95,9 @@ full_xp = 50
 member_last30 = 0 
 members_threshold = 30
 
+with open("censor_text", "r") as file:
+    censored_text = file.read().splitlines()
+
 def get_balance(user_id):
     try:
         response = supabase.table('profiles').select('balance').eq('user_id', user_id).execute()
@@ -201,6 +204,15 @@ async def on_member_join(member):
       await member.kick(member)
   else:
       member_last30 += 1
+
+@bot.event
+async def on_message_join(message):
+    if message.content in censored_text:
+        try:
+            await message.delete()
+        except Exception as err:
+            print(f"Error while deleting message, \"{message.content}\", {err}")
+    
       
 @bot.command()
 @commands.has_permissions(administrator=True)
