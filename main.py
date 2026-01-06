@@ -95,7 +95,7 @@ full_xp = 50
 member_last30 = 0 
 members_threshold = 30
 
-with open("censor_text", "r") as file:
+with open("censor_text.txt", "r") as file:
     censored_text = file.read().splitlines()
 
 def get_balance(user_id):
