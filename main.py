@@ -206,14 +206,15 @@ async def on_member_join(member):
       member_last30 += 1
 
 @bot.event
-async def on_message_join(message):
-    for word in message.content:
-        if word in censored_text:
-            try:
-                await message.delete()
-            except Exception as error:
-                print(error)
-    
+async def on_message(message):
+    words = message.content.split()
+
+    for word in words:
+        if word.lower() in censored_text:
+            await message.delete()
+            return
+
+    await bot.process_commands(message)
       
 @bot.command()
 @commands.has_permissions(administrator=True)
