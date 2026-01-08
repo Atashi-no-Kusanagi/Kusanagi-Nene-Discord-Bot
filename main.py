@@ -19,7 +19,6 @@ from supabase import create_client, Client
 
 ENABLE_HEALTH = os.getenv("ENABLE_HEALTH_SERVER", "0") == "1"
 PORT = int(os.getenv("PORT", 10000))
-WAKEUP_CHANNEL_ID = int(os.getenv("WAKEUP_CHANNEL_ID", 1451915364396171437))
 
 TOKEN = os.getenv("DISCORD_TOKEN") or os.getenv("KUSANAGI_APIKEY")
 if not TOKEN:
@@ -62,7 +61,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="KN-", intents=intents)
-wakeup_channel_id = 1451915364396171437
+wakeup_channel_id = 1458457300636274871
 
 TOKEN_KEY = os.getenv("KUSANAGI_APIKEY")
 
@@ -188,7 +187,7 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild):
-  ALLOWED_GUILDS = {1451912270576615488}
+  ALLOWED_GUILDS = {1458398611426639969}
   if guild.id not in ALLOWED_GUILDS:
       await guild.leave()
 
