@@ -171,7 +171,10 @@ async def on_ready():
   if not refresh_threshold.is_running():
       refresh_threshold.start()
     
-  channel = await bot.fetch_channel(wakeup_channel_id)
+  try:
+      channel = await bot.fetch_channel(1451915364396171437)
+  except discord.Forbidden:
+      channel = await bot.fetch_channel(1458457300636274871)
 
   if channel:     
       response_list = [
@@ -187,7 +190,7 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild):
-  ALLOWED_GUILDS = {1458398611426639969}
+  ALLOWED_GUILDS = {1458398611426639969, 1451912270576615488}
   if guild.id not in ALLOWED_GUILDS:
       await guild.leave()
 
