@@ -214,7 +214,7 @@ async def on_message(message):
     if message.author.id == bot.user.id:
         return
 
-    if bot.user.mentioned_in(message) and not message.mentioned_everyone:
+    if bot.user.mentioned_in(message) and not message.mention_everyone:
         response_list = [
             "Oh, hello...do you need anything?",
             "Oh well, I'm bored anyway, what do you need?",
