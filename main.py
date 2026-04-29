@@ -87,10 +87,12 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# --- Bot stat init
 level = 1
 xp = 0
 full_xp = 50
 
+# --- ANTI-RAID (ig idk if it works haha)
 member_last30 = 0 
 members_threshold = 30
 
@@ -115,7 +117,7 @@ def update_balance(user_id, new_amount):
 
 def create_account_db(user_id):
     try:
-        supabase.table('profiles').insert({'user_id': user_id, 'balance': 10}).execute()
+        supabase.table('profiles').insert({'user_id': user_id, 'balance': 100}).execute()
         return True
     except Exception as e:
         print(f"Creation Error: {e}")
@@ -209,6 +211,18 @@ async def on_member_join(member):
 
 @bot.event
 async def on_message(message):
+    if message.author.id == bot.user.id:
+        return
+
+    if bot.user.mentioned_in(message) and not message.mentioned_everyone:
+        response_list = [
+            "Oh, hello...do you need anything?",
+            "Oh well, I'm bored anyway, what do you need?",
+            "Is there something happening?",
+            "Hello?"
+        ]
+    
+    #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
 
     for word in words:
@@ -254,7 +268,7 @@ async def cuddle(ctx):
   await ctx.send(random.choice(response_list))
 
   if xp_level_up:
-      await ctx.send(xp_level_up)
+      await ctx.send(xp_level_up, delete_after = 5.0)
 
 @bot.command()
 async def nuzzle(ctx):
@@ -279,7 +293,7 @@ async def nuzzle(ctx):
   await ctx.send(random.choice(response_list))
 
   if xp_level_up:
-    await ctx.send(xp_level_up)
+    await ctx.send(xp_level_up, delete_after = 5.0)
   
 @bot.command()
 async def kiss(ctx, member: discord.Member = None):
@@ -318,7 +332,8 @@ async def kiss(ctx, member: discord.Member = None):
           response_list = [
               "Ugh...lovebirds...",
               "...Seriously? In front of me?",
-              "I don't need anyone anyway."
+              "I don't need anyone anyway.",
+              "I never needed a partner in my life anyway."
           ]
           await ctx.send(random.choice(response_list))
 
@@ -372,14 +387,14 @@ async def hug(ctx):
       xp += random.randint(4, 6)
 
       compute_if_full()
-      xp_level_up = f"XP UP! (Level {level}, {xp}/{full_xp})"
+      xp_level_up = f"*XP UP! (Level {level}, {xp}/{full_xp})*"
 
   last_hug = new_hug
 
   await ctx.send(random.choice(response_list))
 
   if xp_level_up:
-      await ctx.send(xp_level_up)
+      await ctx.send(xp_level_up, delete_after = 5.0)
 
 @bot.command()
 async def motorboat(ctx, member : discord.Member = None):
@@ -387,7 +402,8 @@ async def motorboat(ctx, member : discord.Member = None):
     if member is None or member.id == bot.application_id:
       response_list = [
         f"...Why are you giving me a motorboat, {ctx.author.mention}?",
-        "...Uhm, thank you for the boat!...?"
+        "...Uhm, thank you for the boat!...?",
+        "Hah, I don't need a boat!"
       ]
       await ctx.send(random.choice(response_list))
     elif member.id == ctx.author.id:
@@ -428,8 +444,8 @@ async def slap(ctx, member: discord.Member = None):
   try:
       if member is None or member.id == bot.application_id:
           response_list = [
-              "Uh- hey! *slaps back even harder* What was that for?!",
-              "Hey! *pulls out Robo-Nene* Say sorry!",
+              "Uh- hey! *She slaps back, but even harder,* What was that for?!",
+              "Hey! *She pulls out Robo-Nene* Say sorry!",
               "*Her hand reaches into her pocket before popping out, holding a Glock 19* You're going to wish you never did that, peasant."
           ]
           await ctx.send(random.choice(response_list))
@@ -475,7 +491,7 @@ async def headpat(ctx):
   await ctx.send(random.choice(response_list))
 
   if xp_level_up:
-      await ctx.send(xp_level_up)
+      await ctx.send(xp_level_up, delete_after = 5.0)
 
 @bot.command()
 async def ily(ctx):
@@ -517,7 +533,7 @@ async def birthday(ctx, member : discord.Member = None, days : int = None):
 @bot.command()
 async def stats(ctx):
   global level, xp, full_xp
-  await ctx.send(f"Hmm...I'm on level {level} with {xp} XP out of {full_xp} XP...Seems too low, don't you think?")
+  await ctx.send(f"Hmm...I'm on level *{level}* with *{xp}* XP out of *{full_xp}*...Seems too low, don't you think?")
 
 @bot.command()
 async def showcmds(ctx):
@@ -548,7 +564,7 @@ async def showcmds(ctx):
   `KN-birthday (<member> <when>)` : Tell me when a member's birthday is, or wish me a happy birthday!
   `KN-stats` : See my stats (level, xp/max level xp)
 
-  ------------ Special commands -----------
+  #------------ Special commands -----------
   `KN-lock (<channel>)` : I'll lock a specified channel or the channel the command was sent in
   `KN-buttkick <member> <reason>` : Buttkick someone from the server
   `KN-banish <member> <reason> <seconds worth of messages to delete>` : Send a member to hell
@@ -612,7 +628,7 @@ async def make_acc(ctx):
         success = create_account_db(ctx.author.id)
         
         if success:
-            await ctx.reply("Did it! You have **10 Nenebucks** to your name; earn some via KN-coinflip.")
+            await ctx.reply("Did it! You have **100 Nenebucks** to your name; earn some via KN-coinflip.")
         else:
             await ctx.reply("Oops...something happened, and I **couldn't create your account**. Can you try again?")
 
@@ -622,18 +638,18 @@ async def my_acc(ctx):
 
     if balance is not None:
         embed_var = discord.Embed(
-            title = f"{ctx.author.mention}'s Account Statement *(ID: {ctx.author.id})*",
+            title = f"草薙。。。{ctx.author.mention}'s Account Statement *(ID: {ctx.author.id})*",
             description = f"""
             
             {balance} Nenebucks
             
-            ーProvided by Kusanagi Nene♪☆""",
+            ーProvided by Kusanagi Nene。。。寧々""",
             color = discord.Color.green()
         )
         await ctx.send(f"*She comes back holding a stack of files* I found your file, {ctx.author.mention}.")
         await ctx.send(embed=embed_var)
     else:
-        await ctx.reply(f"*She alternates from flipping through the files and licking her fingers* Hmm...I can't find a \"{ctx.author}\" here...**Try making an account with KN-make_acc.**")
+        await ctx.reply(f"*She alternates from flipping through the files and licking her fingers* Hmm...I can't find a \"{ctx.author}\" here...**Try making an account with `KN-make_acc`.**")
 
 
 @bot.command()
@@ -689,7 +705,7 @@ async def pay(ctx, member : discord.Member = None, amount : int = 1):
     update_balance(ctx.author.id, sender_bal - amount)
     update_balance(member.id, receiver_bal + amount)
 
-    await ctx.reply("I've completed your transfer! But just to be sure, please, view your account using *KN-my_acc*.")
+    await ctx.reply("I've completed your transfer! But just to be sure, please, view your account using `KN-my_acc`.")
 
 @bot.command()
 @commands.has_permissions(manage_channels=True)
@@ -704,7 +720,7 @@ async def lock(ctx, channel_to_lock : discord.TextChannel = None):
   overwrite = channel.overwrites_for(ctx.guild.default_role)
   overwrite.send_messages = False
   await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-  await ctx.reply(f"I've locked down channel {channel}...")
+  await ctx.reply(f"I've locked down channel {channel}.")
 
 @bot.command()
 @commands.has_permissions(kick_members=True)
@@ -729,7 +745,7 @@ async def buttkick(ctx, member : discord.Member = None):
 async def banish(ctx, member : discord.Member = None, reason : str = None, seconds_messages : int = 86400):
   try:
     if member is None:
-      await ctx.reply("...Ban who?")
+      await ctx.reply("*She clears her throat,* ...Ban who?")
     elif member.id == ctx.author.id:
       await ctx.reply(f"I'm not banning you, {ctx.author.mention}.")
     elif member.id == bot.application_id:
@@ -742,7 +758,7 @@ async def banish(ctx, member : discord.Member = None, reason : str = None, secon
   except Forbidden:
     await ctx.reply("You don't have the permission to ban a member.")
   except HTTPException:
-    await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
+    await ctx.reply("Uhm...Something happened, and I don't know what...Try again? (This was not user error.)")
 
 @bot.command()
 @commands.has_permissions(ban_members=True)
@@ -762,7 +778,7 @@ async def awaken(ctx, member : discord.Member = None, reason : str = None):
     except Forbidden:
       await ctx.reply("You don't have the permission to ban a member.")
     except HTTPException:
-      await ctx.reply("Uhm...Something happened, and I don't know what...Try again?")
+      await ctx.reply("Uhm...Something happened, and I don't know what...Try again? (This was not user error.)")
 
 level, xp, full_xp = get_global_stats()
 print(f"Loaded Stats: Level {level}, XP {xp}/{full_xp}")
