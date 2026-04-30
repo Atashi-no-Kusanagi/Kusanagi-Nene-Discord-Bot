@@ -221,6 +221,13 @@ async def on_message(message):
             "Is there something happening?",
             "Hello?"
         ]
+
+        channel = await bot.fetch_channel(message.channel.id)
+        
+        if channel:
+            await channel.send(random.choice(response_list))
+        else:
+            print(f"There's no such channel with ID {message.channel.id}.")
     
     #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
