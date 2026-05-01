@@ -214,7 +214,7 @@ async def on_message(message):
     if message.author.id == bot.user.id:
         return
 
-    if bot.user.mentioned_in(message) and not message.mention_everyone:
+    if bot.user.mentioned_in(message) and not message.mention_everyone and message.reference is None:
         response_list = [
             "Oh, hello...do you need anything?",
             "Oh well, I'm bored anyway, what do you need?",
@@ -229,7 +229,7 @@ async def on_message(message):
         else:
             print(f"No such channel with ID {message.channel.id}.")
 
-    if "lumina" in message.lower():
+    if "lumina" in message.content.lower():
         channel = await bot.fetch_channel(message.channel.id)
 
         if channel:
