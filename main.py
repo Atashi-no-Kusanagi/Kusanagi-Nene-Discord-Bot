@@ -227,7 +227,15 @@ async def on_message(message):
         if channel:
             await channel.send(random.choice(response_list))
         else:
-            print(f"There's no such channel with ID {message.channel.id}.")
+            print(f"No such channel with ID {message.channel.id}.")
+
+    if "lumina" in message.lower():
+        channel = await bot.fetch_channel(message.channel.id)
+
+        if channel:
+            await channel.send("https://cdn.discordapp.com/attachments/1451915364396171437/1499719802053333122/IMG_0316.png?ex=69f5d268&is=69f480e8&hm=ac4428db1d6caed733ca48ebce3deeaa8aff847c7c36975960b2e5c196f16938&")
+        else:
+            print(f"No such channel with ID {message.channel.id}.")
     
     #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
