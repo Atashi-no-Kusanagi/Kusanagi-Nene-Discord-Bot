@@ -233,31 +233,9 @@ async def on_message(message):
             print(f"No such channel with ID {message.channel.id}.")
 
     if channel:
-        # No elif statements so we can send different references at the same time
         if "lumina" in message_normalized:
             await channel.send("https://cdn.discordapp.com/attachments/1451915364396171437/1499719802053333122/IMG_0316.png?ex=69f5d268&is=69f480e8&hm=ac4428db1d6caed733ca48ebce3deeaa8aff847c7c36975960b2e5c196f16938&")
 
-        if "thinking space too" in message_normalized or "thinking space ii" in message_normalized:
-            await channel.send("https://tenor.com/view/nuke-powder-gd-demon-top-1-top-1-extreme-demon-extreme-demon-gif-4741330367981334716")
-
-        if "amethyst" in message_normalized:
-            await channel.send("https://tenor.com/view/geometry-dash-gd-amethyst-gd-gd-amethyst-gif-13781308073293548460")
-
-        if "flamewall" in message_normalized:
-            await channel.send("https://tenor.com/view/geometry-dash-flamewall-gd-gif-5918391188933860766")
-
-        if "duel master" in message_normalized or "duelo maestro" in message_normalized:
-            await channel.send("https://tenor.com/view/heartonfireforever-rayrayray8809-gd-dualo-duelo-maestro-gif-5714346728888606575")
-
-        if "tsunami" in message_normalized:
-            await channel.send("https://tenor.com/view/tsunami-geometry-dash-my-honest-reaction-my-honest-reaction-tsunami-tsunami-gd-gif-16677615795371135560")
-
-        if "tidal" in message_normalized:
-            await channel.send("https://tenor.com/view/tidal-wave-geometry-dash-extreme-gif-13003765587223276271")
-
-        if "nullscape" in message_normalized:
-            await channel.send("https://tenor.com/view/nullscapes-shardscapes-gd-geometry-dash-gif-11448968556349928793")
-    
     #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
 
