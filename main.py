@@ -59,6 +59,7 @@ def _start_flask_in_thread():
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(command_prefix="KN-", intents=intents)
 wakeup_channel_id = 1458457300636274871
@@ -579,7 +580,7 @@ async def showcmds(ctx):
   `KN-birthday (<member> <when>)` : Tell me when a member's birthday is, or wish me a happy birthday!
   `KN-stats` : See my stats (level, xp/max level xp)
 
-  #------------ Special commands -----------
+  # ------------ Special commands -----------
   `KN-lock (<channel>)` : I'll lock a specified channel or the channel the command was sent in
   `KN-buttkick <member> <reason>` : Buttkick someone from the server
   `KN-banish <member> <reason> <seconds worth of messages to delete>` : Send a member to hell
