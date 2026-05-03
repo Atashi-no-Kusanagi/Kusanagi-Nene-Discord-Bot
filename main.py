@@ -234,7 +234,7 @@ async def on_message(message):
 
     if channel:
         if "lumina" in message_normalized:
-            await channel.send("https://cdn.discordapp.com/attachments/1451915364396171437/1499719802053333122/IMG_0316.png?ex=69f5d268&is=69f480e8&hm=ac4428db1d6caed733ca48ebce3deeaa8aff847c7c36975960b2e5c196f16938&")
+            await channel.send("https://cdn.discordapp.com/attachments/1483818612547518495/1500437727701897246/500.jpg?ex=69f86f07&is=69f71d87&hm=e94ce6c00425687123bb3b3544fd2589919a026b1e7829eaea454437151cbbc6&")
 
     #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
