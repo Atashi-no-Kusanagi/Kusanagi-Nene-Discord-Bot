@@ -1,6 +1,7 @@
 discord.py
-python-dotenv
 supabase
-flask
 aiohttp
+aiodns
+certifi
+flask
 gunicorn
