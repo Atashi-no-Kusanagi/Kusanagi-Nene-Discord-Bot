@@ -229,7 +229,7 @@ async def on_message(message):
             print(f"No such channel with ID {message.channel.id}.")
 
     if channel:
-        if "lumina" in message_normalized:
+        if random.randint(1, 200) == 1 or "lumina" in message_normalized:
             await channel.send("https://cdn.discordapp.com/attachments/1483818612547518495/1500437727701897246/500.jpg?ex=69f86f07&is=69f71d87&hm=e94ce6c00425687123bb3b3544fd2589919a026b1e7829eaea454437151cbbc6&")
 
     #--- Censorship, censored words indicated in censor_text.txt
