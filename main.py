@@ -223,8 +223,8 @@ async def on_member_join(member):
 
 @bot.event
 async def on_message(message):
-    if message.author.id == bot.user.id:
-        return
+    if message.author.id == bot.user.id: return
+    if message.author.bot: return
 
     message_normalized = message.content.lower()
 
