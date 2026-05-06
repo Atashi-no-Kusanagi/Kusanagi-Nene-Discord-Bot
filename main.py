@@ -258,7 +258,7 @@ async def on_message(message):
             has_nene = True if not has_nene else has_nene
             nenes_to_add += 1
 
-    new_nenes = current_nenes + nenes_to_add
+    new_nenes = (current_nenes or 0) + nenes_to_add
     update_nenes(message.author.id, new_nenes)
     if has_nene:
         if new_nenes > 1:
