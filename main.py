@@ -64,7 +64,7 @@ intents.message_content = True
 intents.members = True
 
 bot = commands.Bot(command_prefix="KN-", intents=intents)
-wakeup_channel_id = 1458457300636274871
+wakeup_channel_id = 1451915364396171437
 
 cuddle_cooldown = 30
 last_cuddle = 0
@@ -186,9 +186,9 @@ async def on_ready():
       refresh_threshold.start()
     
   try:
-      channel = await bot.fetch_channel(1451915364396171437)
+      channel = await bot.fetch_channel(wakeup_channel_id)
   except discord.Forbidden:
-      channel = await bot.fetch_channel(1458457300636274871)
+      print("Failed to fetch main channel fix your bot")
 
   if channel:     
       response_list = [
@@ -204,7 +204,7 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild):
-  ALLOWED_GUILDS = {1458398611426639969, 1451912270576615488}
+  ALLOWED_GUILDS = {1451912270576615488}
   if guild.id not in ALLOWED_GUILDS:
       await guild.leave()
 
@@ -257,7 +257,7 @@ async def on_message(message):
 
         unit = "time" if new_total == 1 else "times"
 
-        await channel.reply(f"{message.author.mention} has said \"Nene\" {new_total} {unit}.")
+        await channel.send(f"{message.author.mention} has said \"Nene\" {new_total} {unit}.")
 
     #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
