@@ -252,7 +252,7 @@ async def on_message(message):
     current_nenes = get_nenes(message.author.id)
     if not current_nenes:
         create_account_db(message.author.id)
-        cirrent_nenes = 0
+        current_nenes = 0
 
     if nenes_in_message > 0:
         new_total = current_nenes + nenes_in_message
