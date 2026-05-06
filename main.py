@@ -123,7 +123,7 @@ def get_nenes(user_id):
 
 def update_nenes(user_id, new_nenes):
     try:
-        response = supabase.table('profiles').uodate({'nenes_said': new_nenes}).eq('user_id', user_id).execute()
+        response = supabase.table('profiles').update({'nenes_said': new_nenes}).eq('user_id', user_id).execute()
     except Exception as e:
         print(f"Error whilst updating nenes: {e}")
 
