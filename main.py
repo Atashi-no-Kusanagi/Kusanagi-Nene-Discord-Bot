@@ -247,25 +247,17 @@ async def on_message(message):
         if random.randint(1, 1000) == 1 or "lumina" in message_normalized:
             await channel.send("https://cdn.discordapp.com/attachments/1483818612547518495/1500437727701897246/500.jpg?ex=69f86f07&is=69f71d87&hm=e94ce6c00425687123bb3b3544fd2589919a026b1e7829eaea454437151cbbc6&")
 
-    has_nene = False
-    nenes_to_add = 0
-    
-    message_split = message_normalized.split()
-    current_nenes = get_nenes(message.author.id)
-    for word in message_split:
-        if not current_nenes: break
-        if "nene" in word:
-            has_nene = True if not has_nene else has_nene
-            nenes_to_add += 1
+    nenes_in_message = message_normalized.count('nene')
 
-    new_nenes = (current_nenes or 0) + nenes_to_add
-    update_nenes(message.author.id, new_nenes)
-    if has_nene:
-        if new_nenes > 1:
-            await channel.reply(f"{message.author.mention} has said \"Nene\" {new_nenes} times!")
-        elif new_nenes == 1:
-            await channel.reply(f"{message.author.mention} has said \"Nene\" {new_nenes} time!") #I care about grammar okay
-            
+    if nenes_in_message > 0:
+        current_nenes = get_nenes(message.author.id) or 0
+        new_total = current_nenes + nenes_in_message
+
+        update_nenes(message.author.id, new_total)
+
+        unit = "time" if new_total == 1 else "times"
+
+        await ctx.reply(f"{message.author.mention} has said \"Nene\" {new_total} {unit}.")
 
     #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
