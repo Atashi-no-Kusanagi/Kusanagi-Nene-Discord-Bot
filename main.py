@@ -255,7 +255,7 @@ async def on_message(message):
     for word in message_split:
         if not current_nenes: break
         if "nene" in word:
-            has_nene = True if not has_nene
+            has_nene = True if not has_nene else has_nene
             nenes_to_add += 1
 
     new_nenes = current_nenes + nenes_to_add
