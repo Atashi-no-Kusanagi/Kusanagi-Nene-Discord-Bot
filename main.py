@@ -112,9 +112,24 @@ def update_balance(user_id, new_amount):
     except Exception as e:
         print(f"Database Error: {e}")
 
+def get_nenes(user_id):
+    try:
+        response = supabase.table('profiles').select('nenes_said').eq('user_id', user_id).execute()
+        if response.data:
+            return response.data[0]['nenes_said']
+        return None
+    except Exception as e:
+        print(f"Error whilst fetching nenes: {e}")
+
+def update_nenes(user_id, new_nenes):
+    try:
+        response = supabase.table('profiles').uodate({'nenes_said': new_nenes}).eq('user_id', user_id).execute()
+    except Exception as e:
+        print(f"Error whilst updating nenes: {e}")
+
 def create_account_db(user_id):
     try:
-        supabase.table('profiles').insert({'user_id': user_id, 'balance': 100}).execute()
+        supabase.table('profiles').insert({'user_id': user_id, 'balance': 100, 'nenes_said': 0}).execute()
         return True
     except Exception as e:
         print(f"Creation Error: {e}")
@@ -229,8 +244,28 @@ async def on_message(message):
             print(f"No such channel with ID {message.channel.id}.")
 
     if channel:
-        if random.randint(1, 200) == 1 or "lumina" in message_normalized:
+        if random.randint(1, 1000) == 1 or "lumina" in message_normalized:
             await channel.send("https://cdn.discordapp.com/attachments/1483818612547518495/1500437727701897246/500.jpg?ex=69f86f07&is=69f71d87&hm=e94ce6c00425687123bb3b3544fd2589919a026b1e7829eaea454437151cbbc6&")
+
+    has_nene = False
+    nenes_to_add = 0
+    
+    message_split = message_normalized.split()
+    current_nenes = get_nenes(message.author.id)
+    for word in message_split:
+        if not current_nenes: break
+        if "nene" in word:
+            has_nene = True if not has_nene
+            nenes_to_add += 1
+
+    new_nenes = current_nenes + nenes_to_add
+    update_nenes(message.author.id, new_nenes)
+    if has_nene:
+        if new_nenes > 1:
+            await channel.reply(f"{message.author.mention} has said \"Nene\" {new_nenes} times!")
+        elif new_nenes == 1:
+            await channel.reply(f"{message.author.mention} has said \"Nene\" {new_nenes} time!") #I care about grammar okay
+            
 
     #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
@@ -640,7 +675,7 @@ async def showcmds(ctx):
   `KN-nuzzle` : Are you sleepy?
 
   **"Money/Finances"**
-  `KN-coinflip <bet> <pick>` : Do a coinflip; winning doubles your bet
+  `KN-coinflip <bet> <pick>` : Do a coinflip; winning returns your bet 1.5x greater
   `KN-make_acc` : Register a new unique account
   `KN-my_acc` : View your account (after registering!)
   `KN-pay <member> <amount>` : Pay someone <amount> Nenebucks!
@@ -697,7 +732,7 @@ async def coinflip(ctx, bet : int, pick):
 
         if pick == coin_actual:
             msg_to_send.description += f" You won, {ctx.author.mention}!"
-            winnings = bet * 2
+            winnings = bet * 1.5
             update_balance(ctx.author.id, new_bal + winnings)
         else:
             msg_to_send.description += f" Oof...you lost, {ctx.author.mention}, but hey, better luck next time."
