@@ -257,7 +257,7 @@ async def on_message(message):
 
         unit = "time" if new_total == 1 else "times"
 
-        await ctx.reply(f"{message.author.mention} has said \"Nene\" {new_total} {unit}.")
+        await channel.reply(f"{message.author.mention} has said \"Nene\" {new_total} {unit}.")
 
     #--- Censorship, censored words indicated in censor_text.txt
     words = message.content.split()
