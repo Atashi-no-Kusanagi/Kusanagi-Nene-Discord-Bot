@@ -29,7 +29,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 AI_SERVER_URL = os.getenv("HF_SPACE_URL")
 
-file_path = "500.jpeg"
+file_path = discord.File("500.jpeg")
 
 if SUPABASE_URL and SUPABASE_KEY:
     try:
@@ -247,7 +247,7 @@ async def on_message(message):
 
     if channel:
         if random.randint(1, 1000) == 1 or "lumina" in message_normalized:
-            await channel.send(file=discord.File(file_path))
+            await channel.send(file=file_path)
 
     nenes_in_message = message_normalized.count('nene')
 
