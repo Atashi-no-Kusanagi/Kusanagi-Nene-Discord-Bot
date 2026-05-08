@@ -29,6 +29,8 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 AI_SERVER_URL = os.getenv("HF_SPACE_URL")
 
+file_path = "500.jpeg"
+
 if SUPABASE_URL and SUPABASE_KEY:
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -245,7 +247,7 @@ async def on_message(message):
 
     if channel:
         if random.randint(1, 1000) == 1 or "lumina" in message_normalized:
-            await channel.send("https://cdn.discordapp.com/attachments/1483818612547518495/1500437727701897246/500.jpg?ex=69f86f07&is=69f71d87&hm=e94ce6c00425687123bb3b3544fd2589919a026b1e7829eaea454437151cbbc6&")
+            await channel.send(file=file_path)
 
     nenes_in_message = message_normalized.count('nene')
 
