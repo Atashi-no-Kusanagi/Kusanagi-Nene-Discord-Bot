@@ -14,6 +14,7 @@ from flask import Flask, jsonify
 import threading
 from threading import Thread
 import aiohttp
+import re
 
 from supabase import create_client, Client
 
@@ -249,7 +250,8 @@ async def on_message(message):
         if random.randint(1, 1000) == 1 or "lumina" in message_normalized:
             await channel.send(file=discord.File(file_path))
 
-    nenes_in_message = message_normalized.count('nene')
+    nenes_in_message = re.findall(r"\bnene\b", message_normalized)
+    nenes_in_message = len(nenes_in_message)
 
     current_nenes = get_nenes(message.author.id)
     if not current_nenes:
