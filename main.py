@@ -247,7 +247,7 @@ async def on_message(message):
 
     if channel:
         if random.randint(1, 1000) == 1 or "lumina" in message_normalized:
-            await channel.send(file=file_path)
+            await channel.send(file=discord.File(file_path))
 
     nenes_in_message = message_normalized.count('nene')
 
