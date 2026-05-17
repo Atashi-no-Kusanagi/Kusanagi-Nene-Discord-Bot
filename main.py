@@ -247,9 +247,27 @@ async def on_message(message):
             print(f"No such channel with ID {message.channel.id}.")
 
     if channel:
-        if random.randint(1, 1000) == 1 or "lumina" in message_normalized:
-            await channel.send(file=discord.File(file_path))
-
+        if "duel master" in message_nornalized or "duelo maestro" in message_normalized:
+            await channel.send("https://tenor.com/view/heartonfireforever-rayrayray8809-gd-dualo-duelo-maestro-gif-5714346728888606575")
+        elif "amethyst" in message_normalized:
+            await channel.send("https://tenor.com/view/geometry-dash-gd-amethyst-gd-gd-amethyst-gif-13781308073293548460")
+        elif "flamewall" in message_normalized or "flame" in message_normalized:
+            await channel.send("https://tenor.com/view/geometry-dash-flamewall-gd-gif-5918391188933860766")
+        elif "clubstep" in message_normalized or "club" in message_normalized:
+            await channel.send("https://tenor.com/view/clubstep-clubstep-reference-geometry-dash-gd-robtop-gif-10743370618008817767")
+        elif "thinking space too" in message_normalized or "thinking" in message_normalized:
+            await channel.send("https://tenor.com/view/nuke-powder-gd-demon-top-1-top-1-extreme-demon-extreme-demon-gif-4741330367981334716")
+        elif "limbo" in message_normalized:
+            await channel.send("https://tenor.com/view/geometry-dash-limbo-keys-gif-1442658006152416535")
+        elif "orbit" in message_normalized:
+            await channel.send("https://tenor.com/view/geometry-dash-orbit-mindcap-gif-13859426127284628543")
+        elif "i spy" in message_normalized:
+            await channel.send("https://tenor.com/view/ispy-gif-9746475918737023676")
+        elif "heliopolis" in message_normalized:
+            await channel.send("https://tenor.com/view/gd-heliopolis-geometry-dash-mindcap-and-more-gif-2360660872215290542")
+        elif "ton" in message_normalized:
+            await channel.send("https://tenor.com/view/geometry-dash-ton-618-gif-8453270315456150982")
+    
     nenes_in_message = re.findall(r"\bnene\b", message_normalized)
     nenes_in_message = len(nenes_in_message)
 
