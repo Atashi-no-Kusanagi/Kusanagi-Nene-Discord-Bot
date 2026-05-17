@@ -247,7 +247,7 @@ async def on_message(message):
             print(f"No such channel with ID {message.channel.id}.")
 
     if channel:
-        if "duel master" in message_nornalized or "duelo maestro" in message_normalized:
+        if "duel master" in message_normalized or "duelo maestro" in message_normalized:
             await channel.send("https://tenor.com/view/heartonfireforever-rayrayray8809-gd-dualo-duelo-maestro-gif-5714346728888606575")
         elif "amethyst" in message_normalized:
             await channel.send("https://tenor.com/view/geometry-dash-gd-amethyst-gd-gd-amethyst-gif-13781308073293548460")
