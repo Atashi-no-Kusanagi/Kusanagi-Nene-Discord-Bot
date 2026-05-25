@@ -247,7 +247,7 @@ async def on_message(message):
             print(f"No such channel with ID {message.channel.id}.")
 
     if channel:
-        if "duel master" in message_normalized or "duelo maestro" in message_normalized or "?" in message_normalized:
+        if "duel master" in message_normalized or "duelo maestro" in message_normalized or "duel" in message_normalized:
             await channel.send("https://tenor.com/view/heartonfireforever-rayrayray8809-gd-dualo-duelo-maestro-gif-5714346728888606575")
         elif "amethyst" in message_normalized:
             await channel.send("https://tenor.com/view/geometry-dash-gd-amethyst-gd-gd-amethyst-gif-13781308073293548460")
@@ -259,7 +259,7 @@ async def on_message(message):
             await channel.send("https://tenor.com/view/geometry-dash-flamewall-gd-gif-5918391188933860766")
         elif "clubstep" in message_normalized or "club" in message_normalized:
             await channel.send("https://tenor.com/view/clubstep-clubstep-reference-geometry-dash-gd-robtop-gif-10743370618008817767")
-        elif "thinking space too" in message_normalized or "thinking" in message_normalized:
+        elif "thinking space too" in message_normalized or "thinking space" in message_normalized:
             await channel.send("https://tenor.com/view/nuke-powder-gd-demon-top-1-top-1-extreme-demon-extreme-demon-gif-4741330367981334716")
         elif "limbo" in message_normalized:
             await channel.send("https://tenor.com/view/geometry-dash-limbo-keys-gif-1442658006152416535")
