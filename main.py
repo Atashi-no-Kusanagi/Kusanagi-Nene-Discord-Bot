@@ -67,7 +67,7 @@ intents.message_content = True
 intents.members = True
 
 bot = commands.Bot(command_prefix="KN-", intents=intents)
-wakeup_channel_id = 1451915364396171437
+wakeup_channel_id = 1507615952714338355
 
 cuddle_cooldown = 30
 last_cuddle = 0
@@ -207,7 +207,7 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild):
-  ALLOWED_GUILDS = {1451912270576615488}
+  ALLOWED_GUILDS = {1503398725735813150}
   if guild.id not in ALLOWED_GUILDS:
       await guild.leave()
 
