@@ -30,8 +30,6 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 AI_SERVER_URL = os.getenv("HF_SPACE_URL")
 
-file_path = "500.jpeg"
-
 if SUPABASE_URL and SUPABASE_KEY:
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
