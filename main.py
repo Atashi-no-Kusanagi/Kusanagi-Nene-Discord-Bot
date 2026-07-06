@@ -192,7 +192,8 @@ async def on_ready():
   except discord.Forbidden:
       try:
           channel = await bot.fetch_channel(nu_channel_id)
-      print("Failed to fetch main channel fix your bot")
+      except discord.Forbidden:
+          print("Failed to fetch main channel fix your bot")
 
   if channel:     
       response_list = [
