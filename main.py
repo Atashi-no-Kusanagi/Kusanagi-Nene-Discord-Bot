@@ -208,9 +208,9 @@ async def on_ready():
   msg_to_send = random.choice(response_list)
 
   if da_channel:     
-      await channel.send(msg_to_send)
+      await da_channel.send(msg_to_send)
   if nu_channel:
-      await channel.send(msg_to_send)
+      await nu_channel.send(msg_to_send)
   
 
 @bot.event
