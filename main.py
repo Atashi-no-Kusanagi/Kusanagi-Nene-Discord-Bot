@@ -188,24 +188,30 @@ async def on_ready():
       refresh_threshold.start()
     
   try:
-      channel = await bot.fetch_channel(da_channel_id)
+      da_channel = await bot.fetch_channel(da_channel_id)
   except discord.Forbidden:
+      print("Failed to fetch DA channel fix your bot")
+  finally:
       try:
-          channel = await bot.fetch_channel(nu_channel_id)
+          nu_channel = await bot.fetch_channel(nu_channel_id) #Regardless of whether da_channel exists, fetch nu_channel
       except discord.Forbidden:
-          print("Failed to fetch main channel fix your bot")
-
-  if channel:     
-      response_list = [
+          print("Failed to fetch NU channel too lol")
+    
+  response_list = [
           "Ugh...I'm awake...I'm awake!...",
           "Ahh...good morning...or afternoon...or night, actually, what time is it?",
           "What are you doing in my room?!",
           "Hey, what's happening?",
           "Mmmh...who woke me up?",
           "Can't I get five more minutes, please?"]
-      msg_to_send = random.choice(response_list)
-      await channel.send(msg_to_send)
 
+  msg_to_send = random.choice(response_list)
+
+  if da_channel:     
+      await channel.send(msg_to_send)
+  if nu_channel:
+      await channel.send(msg_to_send)
+  
 
 @bot.event
 async def on_guild_join(guild):
