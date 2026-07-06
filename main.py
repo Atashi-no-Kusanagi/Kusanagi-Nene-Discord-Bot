@@ -65,7 +65,8 @@ intents.message_content = True
 intents.members = True
 
 bot = commands.Bot(command_prefix="KN-", intents=intents)
-wakeup_channel_id = 1507615952714338355
+da_channel_id = 1507615952714338355
+nu_channel_id = 1522808418098872482
 
 cuddle_cooldown = 30
 last_cuddle = 0
@@ -187,8 +188,10 @@ async def on_ready():
       refresh_threshold.start()
     
   try:
-      channel = await bot.fetch_channel(wakeup_channel_id)
+      channel = await bot.fetch_channel(da_channel_id)
   except discord.Forbidden:
+      try:
+          channel = await bot.fetch_channel(nu_channel_id)
       print("Failed to fetch main channel fix your bot")
 
   if channel:     
@@ -205,7 +208,7 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild):
-  ALLOWED_GUILDS = {1503398725735813150}
+  ALLOWED_GUILDS = {1503398725735813150, 1522800578067955874}
   if guild.id not in ALLOWED_GUILDS:
       await guild.leave()
 
@@ -650,28 +653,43 @@ async def about(ctx, *, prompt: str = None):
         await ctx.reply(f"I can't tell you about something that doesn't exist, {ctx.author.mention}.")
         return
 
+    prompt = prompt.lower()
 
-    if "nk" in prompt.lower() or "neneklassifier" in prompt.lower():
+    if "nk" in prompt or "neneklassifier" in prompt:
         embed = discord.Embed(
             title = "What is \"NeneKlassifier\"?",
             description = """**NeneKlassifier is a Transformer-based model that provides a score to a response given to it depending on how negative it thinks it is.**
 **NeneKlassifier was trained on approximately ***200-250 samples*** and will be exposed to more examples as I get more motivation (lol)**
 
 **NeneKlassifier is an AI model and ***no human interference*** was made to modify any of its answers during generation.**
-**NeneKlassifier's responses may seem unreasonable or biased to some users. This will reduce as it's trained more.**""",
+**NeneKlassifier's responses may seem unreasonable or biased to some users. This will reduce as it's trained more.**
+***(NeneKlassifier will soon be removed to make space for my next project, KATT. (see more with `KN-about katt`)***""",
             color = discord.Color.green())
         await ctx.reply(embed=embed)
-    elif "kn" in prompt.lower() or "knene" in prompt.lower():
+    elif "kn" in prompt or "knene" in prompt:
         embed = discord.Embed(
             title = "What is \"KNene\"?",
             description = """***KNene is a Transformer-based AI model that responds to a given prompt when using `KN-chat`.***
 
 **KNene is a ***22.5 million parameter*** model and thus means that it is an SLM (small language model).
 **KNene was trained on approximately 34 overlapping training samples or 69k tokens and its current version is `K0.6.3`.**
-***KNene's responses do not dictate its developer's political or social stance.***""",
+***KNene's responses do not dictate its developer's political or social stance.***
+***(KNene will soon be removed to make space for my next project, KATT. (see more with `KN-about katt`)***""",
             color = discord.Color.green())
 
         await ctx.reply(embed=embed)
+    elif "katt" in prompt:
+        embed = discord.Embed(
+            title = "What is \"Kusanagi Anti Typo Tyrant\"?",
+            description = """**(This may get too technical)**
+***Kusanagi Anti Typo Tyrant (abbreviated as KATT) is a Transformer-based, probabilistic AI model that flags input text that may contain a typo with a confidence score.***
+
+**KATT is a 574k (~574721) parameter model, meaning that it is regarded as an extremely small Transformer by today's standards.**
+**KATT is trained on 800-1000 samples or (?) tokens, ensuring coverage of ample domains.**
+**Most models like KATT usually input the same scores for the same text, meaning they are deterministic. KATT leverages Monte-Carlo Dropout, which enables KATT to have differing scores for the same text. This makes KATT extrinsically probabilistic, even if it's inherently deterministic.**
+**KATT "knows" who Kusanagi Nene is.**
+***KATT's outputted confidence scores do not dictate any opinions from its developer. KATT is an AI and, as such, its outputs are not 100% reliable.***""",
+            color = discord.Color.green())
     else:
         await ctx.reply(f"...What's a {prompt}?")
 
@@ -705,9 +723,10 @@ async def showcmds(ctx):
   `KN-stats` : See my stats (level, xp/max level xp)
 
   **"Artificial Intelligence (beta)"**
-  `KN-classify <prompt>` : Returns a negativity confidence score from the NeneKlassifier AI model.
-  `KN-chat <text>` : Returns a response from the KNene-K0.6.3 AI model.
-  `KN-about <nk/kn>` : Gives information about NeneKlassifier or KNene or any upcoming AI models to be released.
+  `KN-classify <prompt>` : Returns a negativity confidence score from the NeneKlassifier AI model. (Soon to be removed)
+  `KN-chat <text>` : Returns a response from the KNene-K0.6.3 AI model. (Soon to be removed)
+  `KN-grammar <prompt>` : **(UPCOMING)** Returns a typo confidence score from the Kusanagi Anti Typo Tyrant (KATT-0.3.0) AI model.
+  `KN-about <nk/kn/katt>` : Gives information about NeneKlassifier or KNene or any upcoming AI models to be released.
 
   # ------------ Special commands -----------
   `KN-lock (<channel>)` : I'll lock a specified channel or the channel the command was sent in
@@ -735,7 +754,7 @@ async def coinflip(ctx, bet : int, pick):
 
         initial_msg = discord.Embed(
             title="*Hmm...sure. I'll flip a coin for you.* **Coin flips in the air**",
-            description="The coin lands gracefully",
+            description="**The coin lands gracefully**",
             color=discord.Color.green()
         )
         msg = await ctx.reply(embed=initial_msg)
@@ -746,7 +765,7 @@ async def coinflip(ctx, bet : int, pick):
 
         msg_to_send = discord.Embed(
             title="*Hmm...sure. I'll flip a coin for you.* **Coin flips in the air**",
-            description=f"It was {coin_actual}!",
+            description=f"It was **{coin_actual}!**",
             color=discord.Color.green()
         )
 
